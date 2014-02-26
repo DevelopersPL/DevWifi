@@ -1,0 +1,88 @@
+<div class="hero-unit">
+    <div class="logo"></div>
+    <h1>Formularz dodawania klienta do sieci bezprzewodowej</h1>
+    <div class="content">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a href="#main">Dodawanie klienta</a></li>
+            <li><a href="#edit">Edycja klienta</a></li>
+        </ul>
+
+        <div class="tab-content">
+            <div class="tab-pane active" id="main">
+                <form id="macform" name="macform" class="form-horizontal" method="post" action="{wog: filepath}">
+                    <input type="hidden" name="send" value="domacadd" />
+
+                    <div class="control-group">
+                        <label class="control-label" for="typ">Dane osobowe</label>
+                        <div class="controls">
+                            <select tabindex="1" id="typ" name="typ" style="width: 135px">
+                                <option selected value="u">Uczeń</option>
+                                <option value="n">Nauczyciel</option>
+                                <option value="p">Inny pracownik</option>
+                            </select>
+                            <input  tabindex="2" type="text" id="imie_nazwisko" name="imie_nazwisko" maxlength="75" placeholder="Imię i nazwisko">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="klasa">Klasa</label>
+                        <div class="controls">
+                            <input tabindex="3" type="text" id="klasa" name="klasa" maxlength="3" style="width: 75px" placeholder="np. 3K">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="mac1">MAC Adres</label>
+                        <div class="controls">
+                            <input type="text" id="mac1" name="mac1" style="width: 20px" maxlength="2" tabindex="4">
+                            : <input type="text" id="mac2" name="mac2" style="width: 20px" maxlength="2" tabindex="5">
+                            : <input type="text" id="mac3" name="mac3" style="width: 20px" maxlength="2" tabindex="6">
+                            : <input type="text" id="mac4" name="mac4" style="width: 20px" maxlength="2" tabindex="7">
+                            : <input type="text" id="mac5" name="mac5" style="width: 20px" maxlength="2" tabindex="8">
+                            : <input type="text" id="mac6" name="mac6" style="width: 20px" maxlength="2" tabindex="9">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="type">Typ urządzenia</label>
+                        <div class="controls">
+                            <select name="type" id="type" style="width: 110px">
+                                <option value="laptop">Laptop</option>
+                                <option value="telefon" selected="selected">Telefon</option>
+                                <option value="tablet">Tablet</option>
+                                <option value="inne">Inne</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="mail">Adres e-mail</label>
+                        <div class="controls">
+                            <input  tabindex="11" type="text" id="mail" name="mail" placeholder="Adres e-mail">
+                        </div>
+                    </div>
+
+                    <div class="control-group">
+                        <label class="control-label" for="reg">Regulamin</label>
+                        <div class="controls">
+                            <label class="checkbox">
+                                <input tabindex="12" id="reg" name="reg" value="1" type="checkbox">
+                                Akceptuję <a style="text-decoration: underline" href="{wog: reglink}" title="Regulamin">regulamin</a> dostępu do sieci
+                            </label>
+                        </div>
+                    </div>
+
+                </form>
+            </div>
+            <div class="tab-pane" id="edit">...</div>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#myTab a').click(function (e) {
+        e.preventDefault();
+        $(this).tab('show');
+    })
+</script>
+
