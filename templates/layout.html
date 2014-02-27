@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta name="robots" content="noindex,nofollow" />
+    <meta charset="UTF-8" />
+    <meta name="keywords" content="" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">{wog: meta}
+    <title>ZSE-E Radomsko Wi-Fi</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="css/bootstrap-theme.min.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="css/DevWifi.css" />
+    <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/DevWifi.js"></script>
+</head>
+<body>
+<div class="navbar navbar-inverse navbar-fixed-top">
+    <div class="navbar-inner">
+        <div class="container">
+            <span class="brand">ZSE-E Radomsko Wi-Fi</span>
+            <div class="nav-collapse collapse">
+                <ul class="nav">
+                    <li><a href="#">Link</a></li>
+                    <li><a href="#">Link</a></li>
+                    <li><a href="{{ urlFor('rules') }}">Regulamin</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="container">
+    <div id="logo"></div>
+    {% block content %}{% endblock %}
+    <hr>
+    <footer>
+        <p>Powered by <a href="https://github.com/DevelopersPL/DevWifi" target="_blank">DevWifi</a> - an open source project by <a href="http://developers.pl" target="_blank">Developers.pl</a></p>
+    </footer>
+</div>
+</body>
+</html>

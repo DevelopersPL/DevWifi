@@ -1,0 +1,1 @@
+Templates are cached in this directory.

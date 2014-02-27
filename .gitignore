@@ -1,0 +1,12 @@
+# Composer-installed libraries
+vendor/
+
+# PHPStorm
+.idea/
+
+# app-specific
+cache/
+logs/
+
+# Config
+public_html/config.php
