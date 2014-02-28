@@ -2,10 +2,11 @@
 <html lang="pl">
 <head>
     <meta name="robots" content="noindex,nofollow" />
-    <meta charset="UTF-8" />
     <meta name="keywords" content="" />
     <meta name="description" content="" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">{wog: meta}
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ZSE-E Radomsko Wi-Fi</title>
     <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
     <link rel="stylesheet" href="css/bootstrap-theme.min.css" media="screen">
@@ -13,29 +14,44 @@
     <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
     <script type="text/javascript" src="js/bootstrap.min.js"></script>
     <script type="text/javascript" src="js/DevWifi.js"></script>
+    <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+    <!--[if lt IE 9]>
+    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <![endif]-->
 </head>
 <body>
-<div class="navbar navbar-inverse navbar-fixed-top">
-    <div class="navbar-inner">
-        <div class="container">
-            <span class="brand">ZSE-E Radomsko Wi-Fi</span>
-            <div class="nav-collapse collapse">
-                <ul class="nav">
-                    <li><a href="#">Link</a></li>
-                    <li><a href="#">Link</a></li>
-                    <li><a href="{{ urlFor('rules') }}">Regulamin</a></li>
-                </ul>
-            </div>
+<!-- Fixed navbar -->
+<div class="navbar navbar-default navbar-fixed-top" role="navigation">
+    <div class="container">
+        <div class="navbar-header">
+            <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+            </button>
+            <span class="navbar-brand nav-logo"></span> <a class="navbar-brand" href="/">ZSE-E Radomsko Wi-Fi</a>
         </div>
+        <div class="navbar-collapse collapse">
+            <ul class="nav navbar-nav navbar-right">
+                <li{% if active_page== 'home' %} class="active"{% endif %}><a href="/">Strona główna</a></li>
+                <li{% if active_page== 'rules' %} class="active"{% endif %}><a href="{{ urlFor('rules') }}">Regulamin</a></li>
+            </ul>
+        </div><!--/.nav-collapse -->
     </div>
 </div>
+
 <div class="container">
-    <div id="logo"></div>
-    {% block content %}{% endblock %}
+    <div class="jumbotron">
+        {% block content %}{% endblock %}
+    </div>
+
     <hr>
     <footer>
         <p>Powered by <a href="https://github.com/DevelopersPL/DevWifi" target="_blank">DevWifi</a> - an open source project by <a href="http://developers.pl" target="_blank">Developers.pl</a></p>
     </footer>
-</div>
+</div> <!-- /container -->
 </body>
 </html>

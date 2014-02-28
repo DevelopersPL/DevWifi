@@ -103,7 +103,7 @@ $DevWifi->error(function ($e) use ($DevWifi) {
 
 //////////////////////////// ROUTES //////////////////////////////////
 $DevWifi->get('/', function() use($DevWifi) {
-    $DevWifi->render('layout.html');
+    $DevWifi->render('form.html');
     $DevWifi->log->addInfo('Something worth logging just happened!');
 });
 

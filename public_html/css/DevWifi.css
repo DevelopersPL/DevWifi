@@ -1,0 +1,30 @@
+body {
+    padding-top: 60px;
+    padding-bottom: 40px;
+}
+
+.nav-logo {
+    background: transparent no-repeat url('../img/logo.png');
+    display: inline-block;
+    width: 86px;
+    height: 40px;
+    border: 0;
+    margin-top: 10px;
+    margin-right: 10px;
+}
+
+.form-content {
+    padding: 30px;
+    margin: 30px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+}
+
+.tab-pane, active {
+    border: 1px solid #ddd;
+    border-top: 0;
+    background: #ffffff;
+    padding: 30px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+}
