@@ -2,87 +2,89 @@
 {% set active_page = 'home' %}
 
 {% block content %}
-<div class="text-center">
-    <span class="h2">Formularz dodawania klienta do sieci bezprzewodowej</span>
-</div>
+<div class="jumbotron">
+    <div class="text-center">
+        <span class="h2">Formularz dodawania klienta do sieci bezprzewodowej</span>
+    </div>
 
-<div class="form-content">
-    <ul class="nav nav-tabs" id="myTab">
-        <li class="active"><a href="#main">Dodawanie klienta</a></li>
-        <li><a href="#edit">Edycja klienta</a></li>
-    </ul>
+    <div class="form-content">
+        <ul class="nav nav-tabs" id="myTab">
+            <li class="active"><a href="#main">Dodawanie klienta</a></li>
+            <li><a href="#edit">Edycja klienta</a></li>
+        </ul>
 
-    <div class="tab-content">
-        <div class="tab-pane active" id="main">
-            <form role="form" class="form-horizontal">
+        <div class="tab-content">
+            <div class="tab-pane active" id="main">
+                <form role="form" class="form-horizontal">
 
-                <div class="form-group">
-                    <label for="inputType" class="col-sm-2 control-label">Dane osobowe</label>
-                    <div class="row">
-                        <div class="col-xs-2">
-                            <select tabindex="1" id="inputType" name="type" class="form-control">
-                                <option selected value="u">Uczeń</option>
-                                <option value="n">Nauczyciel</option>
-                                <option value="p">Inny pracownik</option>
-                            </select>
-                        </div>
-                        <div class="col-xs-4">
-                            <input type="text" class="form-control" name="fullname" id="fullname" required placeholder="Imię i nazwisko">
+                    <div class="form-group">
+                        <label for="inputType" class="col-sm-2 control-label">Dane osobowe</label>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <select tabindex="1" id="inputType" name="type" class="form-control">
+                                    <option selected value="u">Uczeń</option>
+                                    <option value="n">Nauczyciel</option>
+                                    <option value="p">Inny pracownik</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="text" class="form-control" name="fullname" id="fullname" required placeholder="Imię i nazwisko">
+                            </div>
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="inputClass" class="col-sm-2 control-label">Klasa</label>
-                    <div class="col-sm-2">
-                        <input type="text" class="form-control" name="class" id="inputClass" placeholder="np. 3K">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="inputMac0" class="col-sm-2 control-label">MAC</label>
-                    <div class="row">
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[0]" required id="inputMac0">
-                        </div>
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[1]" required id="inputMac1">
-                        </div>
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[2]" required id="inputMac2">
-                        </div>
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[3]" required id="inputMac3">
-                        </div>
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[4]" required id="inputMac4">
-                        </div>
-                        <div class="col-xs-1">
-                            <input type="text" class="form-control" name="mac[5]" required id="inputMac5">
+                    <div class="form-group">
+                        <label for="inputClass" class="col-sm-2 control-label">Klasa</label>
+                        <div class="col-sm-2">
+                            <input type="text" class="form-control" name="class" id="inputClass" placeholder="np. 3K">
                         </div>
                     </div>
-                </div>
 
-                <div class="form-group">
-                    <label for="inputEmail" class="col-sm-2 control-label">Adres e-mail</label>
-                    <div class="col-sm-4">
-                        <input type="email" class="form-control" name="email" id="inputEmail" required placeholder="Adres e-mail">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <div class="col-sm-offset-2 col-sm-10">
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci
-                            </label>
+                    <div class="form-group">
+                        <label for="inputMac0" class="col-sm-2 control-label">MAC</label>
+                        <div class="row">
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[0]" required id="inputMac0" maxlength="2">
+                            </div>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[1]" required id="inputMac1" maxlength="2">
+                            </div>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[2]" required id="inputMac2" maxlength="2">
+                            </div>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[3]" required id="inputMac3" maxlength="2">
+                            </div>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[4]" required id="inputMac4" maxlength="2">
+                            </div>
+                            <div class="col-xs-1">
+                                <input type="text" class="form-control" name="mac[5]" required id="inputMac5" maxlength="2">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <button type="submit" class="btn btn-primary">Submit</button>
-            </form>
+
+                    <div class="form-group">
+                        <label for="inputEmail" class="col-sm-2 control-label">Adres e-mail</label>
+                        <div class="col-sm-4">
+                            <input type="email" class="form-control" name="email" id="inputEmail" required placeholder="Adres e-mail">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Submit</button>
+                </form>
+            </div>
+            <div class="tab-pane" id="edit">...</div>
         </div>
-        <div class="tab-pane" id="edit">...</div>
     </div>
 </div>
 {% endblock %}

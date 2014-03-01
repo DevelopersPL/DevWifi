@@ -56,6 +56,10 @@ $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
 );
 
+$view->appendData(array(
+    'ROUTE_PREFIX' => ROUTE_PREFIX
+));
+
 /////////////////////////////// SETUP LOGGER ////////////////////////////////////
 // Create monolog logger and store logger in container as singleton
 // (Singleton resources retrieve the same log resource definition each time)
@@ -67,17 +71,19 @@ $DevWifi->container->singleton('log', function () {
 
 //////////////////// DEFINE AUTHENTICATION MIDDLEWARE ////////////////////////////
 // http://docs.slimframework.com/#Middleware-Overview
-$DevWifi->authenticate = function() use ( $DevWifi ) {
-    $req = $DevWifi->request();
-    $res = $DevWifi->response();
-    $auth_user = $req->headers('PHP_AUTH_USER');
-    $auth_pass = $req->headers('PHP_AUTH_PW');
+$authenticate = function() use ( $DevWifi ) {
+    return function () use ($DevWifi) {
+        $req = $DevWifi->request();
+        $res = $DevWifi->response();
+        $auth_user = $req->headers('PHP_AUTH_USER');
+        $auth_pass = $req->headers('PHP_AUTH_PW');
 
-    if($auth_user != MANAGER_USER || $auth_pass != MANAGER_PASS)
-    {
-        $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', 'DevWifi'));
-        $res->halt(401);
-    }
+        if($auth_user != MANAGER_USER || $auth_pass != MANAGER_PASS)
+        {
+            $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', 'DevWifi'));
+            $DevWifi->halt(401, $DevWifi->view()->render('denied.html'));
+        }
+    };
 };
 
 ////////////////////////////// HANDLE ERRORS ////////////////////////////////////
@@ -102,14 +108,18 @@ $DevWifi->error(function ($e) use ($DevWifi) {
 });
 
 //////////////////////////// ROUTES //////////////////////////////////
-$DevWifi->get('/', function() use($DevWifi) {
+$DevWifi->get(ROUTE_PREFIX.'/', function() use($DevWifi) {
     $DevWifi->render('form.html');
     $DevWifi->log->addInfo('Something worth logging just happened!');
-});
+})->name('home');
 
-$DevWifi->get('/regulamin', function() use($DevWifi) {
+$DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
     $DevWifi->render('rules.html');
 })->name('rules');
+
+$DevWifi->get(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
+    $DevWifi->render('manager.html');
+})->name('manager');
 
 //////////////////////////////////////////////////////////////////////
 // all done, any code after this call will not matter to the request

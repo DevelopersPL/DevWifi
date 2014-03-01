@@ -8,17 +8,17 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>ZSE-E Radomsko Wi-Fi</title>
-    <link rel="stylesheet" href="css/bootstrap.min.css" media="screen">
-    <link rel="stylesheet" href="css/bootstrap-theme.min.css" media="screen">
-    <link rel="stylesheet" type="text/css" href="css/DevWifi.css" />
-    <script type="text/javascript" src="js/jquery-2.1.0.min.js"></script>
-    <script type="text/javascript" src="js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="js/DevWifi.js"></script>
+    <link rel="stylesheet" href="{{ROUTE_PREFIX}}/css/bootstrap.min.css" media="screen">
+    <link rel="stylesheet" href="{{ROUTE_PREFIX}}/css/bootstrap-theme.min.css" media="screen">
+    <link rel="stylesheet" type="text/css" href="{{ROUTE_PREFIX}}/css/DevWifi.css" />
+    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/DevWifi.js"></script>
     <!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
     <!--[if lt IE 9]>
-    <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
-    <script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+    <script src="//oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+    <script src="//oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
     <![endif]-->
 </head>
 <body>
@@ -32,11 +32,11 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <span class="navbar-brand nav-logo"></span> <a class="navbar-brand" href="/">ZSE-E Radomsko Wi-Fi</a>
+            <span class="navbar-brand nav-logo"></span> <a class="navbar-brand" href="{{ urlFor('home') }}">ZSE-E Radomsko Wi-Fi</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
-                <li{% if active_page== 'home' %} class="active"{% endif %}><a href="/">Strona główna</a></li>
+                <li{% if active_page== 'home' %} class="active"{% endif %}><a href="{{ urlFor('home') }}">Strona główna</a></li>
                 <li{% if active_page== 'rules' %} class="active"{% endif %}><a href="{{ urlFor('rules') }}">Regulamin</a></li>
             </ul>
         </div><!--/.nav-collapse -->
@@ -44,9 +44,7 @@
 </div>
 
 <div class="container">
-    <div class="jumbotron">
-        {% block content %}{% endblock %}
-    </div>
+    {% block content %}{% endblock %}
 
     <hr>
     <footer>

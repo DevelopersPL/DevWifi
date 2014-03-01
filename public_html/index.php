@@ -36,6 +36,7 @@ if(is_file('./config.php'))
 defined('APP_ROOT') or define('APP_ROOT', realpath('..'));
 defined('ENABLE_DEBUG') or define('ENABLE_DEBUG', false);
 
+defined('ROUTE_PREFIX') or define('ROUTE_PREFIX', '');
 defined('MANAGER_USER') or define('MANAGER_USER', 'manager');
 defined('MANAGER_PASS') or define('MANAGER_PASS', 'haxxed');
 
