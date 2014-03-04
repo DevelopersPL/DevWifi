@@ -28,24 +28,70 @@
  * @version    master
  * @link       https://github.com/DevelopersPL/DevWifi
  */
-// LOAD CONFIG IF IT EXISTS
-if(is_file('./config.php'))
-    include './config.php';
 
-// DEFAULT CONFIG - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
-defined('APP_ROOT') or define('APP_ROOT', realpath('..'));
-defined('ENABLE_DEBUG') or define('ENABLE_DEBUG', false);
-defined('DB_FILENAME') or define('DB_FILENAME', './client.cfg');
+namespace DevWifi;
 
-defined('ROUTE_PREFIX') or define('ROUTE_PREFIX', '');
-defined('MANAGER_USER') or define('MANAGER_USER', 'manager');
-defined('MANAGER_PASS') or define('MANAGER_PASS', 'haxxed');
+class EntryFactory {
 
-// DO NOT EDIT
-define('PUBLIC_HTML_PATH', realpath('.'));
+    // TODO: file locking
 
-// IF YOU INSTALL PUBLIC_HTML IN A SUBDIRECTORY, FOR EXAMPLE: http://example.com/some/dir/index.php
-// THEN YOU NEED TO SET APP_ROOT ACCORDINGLY. IN THIS CASE TO '../../../DevWifi'
+    protected $entries = array();
 
-chdir(APP_ROOT);
-require './DevWifi/DevWifi.php';
+    protected $handle;
+
+    public function __construct($db)
+    {
+        $this->handle = fopen($db, 'r+');
+        if(!flock($this->handle, LOCK_EX))
+            throw new \Exception('Cannot obtain lock on database!', 503);
+
+        $this->load();
+    }
+
+    public function load()
+    {
+        while(!feof($this->handle)) {
+            $raw = trim(fgets($this->handle));
+            if($raw)
+            {
+                $entry = new Entry($raw);
+                $this->entries[$entry->getMac()] = $entry;
+            }
+        }
+    }
+
+    public function get($mac)
+    {
+        return $this->entries[$mac];
+    }
+
+    public function getAll()
+    {
+        return $this->entries;
+    }
+
+    public function set(Entry $entry)
+    {
+        $this->entries[$entry->getMac()] = $entry;
+    }
+
+    public function delete(Entry $entry)
+    {
+        unset( $this->entries[$entry->getMac()] );
+    }
+
+    public function save()
+    {
+        ftruncate($this->handle, 0);
+        foreach($this->entries as $entry)
+            fwrite($this->handle, $entry->toRaw()."\n");
+
+        fflush($this->handle);
+    }
+
+    public function __destruct ()
+    {
+        flock($this->handle, LOCK_UN);
+        fclose($this->handle);
+    }
+} 

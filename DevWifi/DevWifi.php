@@ -60,7 +60,7 @@ $view->appendData(array(
     'ROUTE_PREFIX' => ROUTE_PREFIX
 ));
 
-/////////////////////////////// SETUP LOGGER ////////////////////////////////////
+/////////////////////////// SETUP LOGGER //////////////////////////////
 // Create monolog logger and store logger in container as singleton
 // (Singleton resources retrieve the same log resource definition each time)
 $DevWifi->container->singleton('log', function () {
@@ -69,7 +69,7 @@ $DevWifi->container->singleton('log', function () {
     return $log;
 });
 
-//////////////////// DEFINE AUTHENTICATION MIDDLEWARE ////////////////////////////
+//////////////// DEFINE AUTHENTICATION MIDDLEWARE /////////////////////
 // http://docs.slimframework.com/#Middleware-Overview
 $authenticate = function() use ( $DevWifi ) {
     return function () use ($DevWifi) {
@@ -86,7 +86,7 @@ $authenticate = function() use ( $DevWifi ) {
     };
 };
 
-////////////////////////////// HANDLE ERRORS ////////////////////////////////////
+/////////////////////////// HANDLE ERRORS /////////////////////////////
 class InputErrorException extends \Exception {};
 $DevWifi->error(function ($e) use ($DevWifi) {
     if($e instanceof InputErrorException)
@@ -107,6 +107,12 @@ $DevWifi->error(function ($e) use ($DevWifi) {
     }
 });
 
+/////////////////////////// ENTRY FACTORY ////////////////////////////
+// Define entry resource
+$DevWifi->container->singleton('entries', function () {
+    return new DevWifi\EntryFactory(DB_FILENAME);
+});
+
 //////////////////////////// ROUTES //////////////////////////////////
 $DevWifi->get(ROUTE_PREFIX.'/', function() use($DevWifi) {
     $DevWifi->render('form.html');
@@ -120,6 +126,11 @@ $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
 $DevWifi->get(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
     $DevWifi->render('manager.html');
 })->name('manager');
+
+$DevWifi->get(ROUTE_PREFIX.'/debug', function() use($DevWifi) {
+    //var_dump($DevWifi->entries->getAll());
+    echo $DevWifi->entries->getAll()['a8:26:d9:ca:22:58']->mac;
+});
 
 //////////////////////////////////////////////////////////////////////
 // all done, any code after this call will not matter to the request
