@@ -171,4 +171,14 @@ class Entry {
     {
         return $this->device;
     }
+
+    public function getDate()
+    {
+        return $this->date;
+    }
+
+    public function getKey()
+    {
+        return $this->key;
+    }
 }

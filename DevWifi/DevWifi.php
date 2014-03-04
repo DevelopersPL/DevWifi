@@ -54,6 +54,11 @@ $view->parserOptions = array(
 );
 $view->parserExtensions = array(
     new \Slim\Views\TwigExtension(),
+    new Twig_Extension_Debug()
+);
+
+$view->parserOptions = array(
+    'debug' => ENABLE_DEBUG
 );
 
 $view->appendData(array(
@@ -124,7 +129,7 @@ $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
 })->name('rules');
 
 $DevWifi->get(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
-    $DevWifi->render('manager.html');
+    $DevWifi->render('manager.html', array('entries' => $DevWifi->entries->getAll(), 'kupa' => 'dupa'));
 })->name('manager');
 
 $DevWifi->get(ROUTE_PREFIX.'/debug', function() use($DevWifi) {

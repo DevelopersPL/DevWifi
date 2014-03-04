@@ -1,8 +1,35 @@
 {% extends "layout.html" %}
 
 {% block content %}
+{#{ dump(entries) }#}
 <div class="text-center">
     <span class="h2">Manager</span>
 </div>
 
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>MAC</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Grade</th>
+        <th>Device Name</th>
+        <th>Date Added</th>
+        <th>Key</th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for entry in entries %}
+    <tr>
+        <td>{{entry.mac|upper}}</td>
+        <td>{{entry.firstName}}</td>
+        <td>{{entry.lastName}}</td>
+        <td>{{entry.grade}}</td>
+        <td>{{entry.device}}</td>
+        <td>{{entry.date|date("d.m.Y")}}</td>
+        <td>{{entry.key}}</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
 {% endblock %}
