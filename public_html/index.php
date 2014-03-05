@@ -36,6 +36,7 @@ if(is_file('./config.php'))
 defined('APP_ROOT') or define('APP_ROOT', realpath('..'));
 defined('ENABLE_DEBUG') or define('ENABLE_DEBUG', false);
 defined('DB_FILENAME') or define('DB_FILENAME', './client.cfg');
+defined('DB_BLACKLIST_FILENAME') or define('DB_BLACKLIST_FILENAME', './blacklist.cfg');
 
 defined('ROUTE_PREFIX') or define('ROUTE_PREFIX', '');
 defined('MANAGER_USER') or define('MANAGER_USER', 'manager');

@@ -41,8 +41,8 @@ class EntryFactory {
 
     public function __construct($db)
     {
-        $this->handle = fopen($db, 'r+');
-        if(!flock($this->handle, LOCK_EX))
+        $this->handle = fopen($db, 'c+');
+        if(!flock($this->handle, LOCK_EX | LOCK_NB))
             throw new \Exception('Cannot obtain lock on database!', 503);
 
         $this->load();
@@ -82,9 +82,14 @@ class EntryFactory {
 
     public function save()
     {
+        foreach($this->entries as $entry)
+            if(!$entry->isValid())
+                throw new \InputErrorException('Entry '.$entry->mac.' is not valid!');
+
+        rewind($this->handle);
         ftruncate($this->handle, 0);
         foreach($this->entries as $entry)
-            fwrite($this->handle, $entry->toRaw()."\n");
+                fwrite($this->handle, $entry->toRaw()."\n");
 
         fflush($this->handle);
     }

@@ -5,7 +5,17 @@
 <div class="text-center">
     <span class="h2">Manager</span>
 </div>
-
+{% if error is defined %}
+<div class="alert alert-danger">
+    <div class="text-center">
+        {{error}}
+    </div>
+</div>
+{% endif %}
+<hr/>
+<div class="text-center">
+    <span class="h3">Authorized list</span>
+</div>
 <table class="table table-striped">
     <thead>
     <tr>
@@ -16,6 +26,7 @@
         <th>Device Name</th>
         <th>Date Added</th>
         <th>Key</th>
+        <th></th>
     </tr>
     </thead>
     <tbody>
@@ -28,6 +39,73 @@
         <td>{{entry.device}}</td>
         <td>{{entry.date|date("d.m.Y")}}</td>
         <td>{{entry.key}}</td>
+        <td>
+            <form method="post" style="float:left;">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="scope" value="entries" />
+                <input type="hidden" name="mac" value="{{entry.mac}}" />
+                <button type="submit" class="btn btn-warning btn-xs">Delete</button>
+            </form>
+            <form method="post" style="float:left; padding-left: 5px;">
+                <input type="hidden" name="action" value="blacklist" />
+                <input type="hidden" name="scope" value="entries" />
+                <input type="hidden" name="mac" value="{{entry.mac}}" />
+                <button type="submit" class="btn btn-danger btn-xs">Blacklist</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="8" class="text-center">This list s empty.</td>
+    </tr>
+    {% endfor %}
+    </tbody>
+</table>
+<hr/>
+<div class="text-center">
+    <span class="h3">Blacklist</span>
+</div>
+<table class="table table-striped">
+    <thead>
+    <tr>
+        <th>MAC</th>
+        <th>First Name</th>
+        <th>Last Name</th>
+        <th>Grade</th>
+        <th>Device Name</th>
+        <th>Date Added</th>
+        <th>Key</th>
+        <th></th>
+    </tr>
+    </thead>
+    <tbody>
+    {% for entry in blacklist %}
+    <tr>
+        <td>{{entry.mac|upper}}</td>
+        <td>{{entry.firstName}}</td>
+        <td>{{entry.lastName}}</td>
+        <td>{{entry.grade}}</td>
+        <td>{{entry.device}}</td>
+        <td>{{entry.date|date("d.m.Y")}}</td>
+        <td>{{entry.key}}</td>
+        <td>
+            <form method="post" style="float:left;">
+                <input type="hidden" name="action" value="delete" />
+                <input type="hidden" name="scope" value="blacklist" />
+                <input type="hidden" name="mac" value="{{entry.mac}}" />
+                <button type="submit" class="btn btn-warning btn-xs">Delete</button>
+            </form>
+            <form method="post" style="float:left; padding-left: 5px;">
+                <input type="hidden" name="action" value="readd" />
+                <input type="hidden" name="scope" value="blacklist" />
+                <input type="hidden" name="mac" value="{{entry.mac}}" />
+                <button type="submit" class="btn btn-success btn-xs">Readd</button>
+            </form>
+        </td>
+    </tr>
+    {% else %}
+    <tr>
+        <td colspan="8" class="text-center">This list s empty.</td>
     </tr>
     {% endfor %}
     </tbody>

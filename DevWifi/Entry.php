@@ -80,10 +80,15 @@ class Entry {
         call_user_func( array($this,'set'.ucfirst((string)$property)), $value );
     }
 
+    public function isValid()
+    {
+        return ($this->mac && $this->firstName && $this->lastName && $this->grade && $this->device && $this->date && $this->key);
+    }
+
     public function toRaw()
     {
-        if(!$this->mac || !$this->firstName || !$this->lastName || $this->grade || !$this->device || !$this->date || $this->key)
-            throw new InputErrorException('Entry is not valid, cannot serialize to raw.', 503);
+        if(!$this->isValid())
+            throw new \InputErrorException('Entry is not valid, cannot serialize to raw.', 503);
 
         return '192.168.99. 300/64 auto 100 '.$this->mac.' 0 0 WAN1 '.$this->firstName.'.'.$this->lastName
                 .'.'.$this->grade.'.'.$this->device.'.'.$this->date->format('d.m.Y').'.'.$this->key.' 0 0 0 0';
@@ -106,7 +111,7 @@ class Entry {
     {
         if( !filter_var($mac, FILTER_VALIDATE_REGEXP,
             array('options' => array('regexp' => '/([a-fA-F0-9]{2}[:|\-]?){6}/'))) )
-            throw new InputErrorException('MAC address is not valid.', 400);
+            throw new \InputErrorException('MAC address is not valid.', 400);
 
         $this->mac = strtolower($mac);
     }
@@ -120,7 +125,7 @@ class Entry {
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
             array('options' => array('regexp' => '/([a-zA-Z]{1-15}/'))) )
-            throw new InputErrorException('First name is not valid.', 400);
+            throw new \InputErrorException('First name is not valid.', 400);
 
         $this->firstName = $v;
     }
@@ -134,7 +139,7 @@ class Entry {
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
             array('options' => array('regexp' => '/([a-zA-Z]{1-20}/'))) )
-            throw new InputErrorException('Last name is not valid.', 400);
+            throw new \InputErrorException('Last name is not valid.', 400);
 
         $this->lastName = $v;
     }
@@ -148,7 +153,7 @@ class Entry {
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
             array('options' => array('regexp' => '/([a-zA-Z0-9]{1-4}/'))) )
-            throw new InputErrorException('Grade is not valid.', 400);
+            throw new \InputErrorException('Grade is not valid.', 400);
 
         $this->grade = $v;
     }
@@ -162,7 +167,7 @@ class Entry {
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
             array('options' => array('regexp' => '/([a-zA-Z]{1-10}/'))) )
-            throw new InputErrorException('Device name is not valid.', 400);
+            throw new \InputErrorException('Device name is not valid.', 400);
 
         $this->device = $v;
     }

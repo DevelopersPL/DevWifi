@@ -33,6 +33,7 @@
 $loader = require APP_ROOT . '/vendor/autoload.php';
 $loader->setPsr4('DevWifi\\', APP_ROOT . '/DevWifi');
 
+use \DevWifi\Entry;
 
 //////////////////////// CREATE Slim APPLICATION //////////////////////////////////
 $DevWifi = new \Slim\Slim(array(
@@ -118,23 +119,70 @@ $DevWifi->container->singleton('entries', function () {
     return new DevWifi\EntryFactory(DB_FILENAME);
 });
 
+$DevWifi->container->singleton('blacklist', function () {
+    return new DevWifi\EntryFactory(DB_BLACKLIST_FILENAME);
+});
+
 //////////////////////////// ROUTES //////////////////////////////////
-$DevWifi->get(ROUTE_PREFIX.'/', function() use($DevWifi) {
+$DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
     $DevWifi->render('form.html');
     $DevWifi->log->addInfo('Something worth logging just happened!');
-})->name('home');
+})->via('GET', 'POST')->name('home');
 
 $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
     $DevWifi->render('rules.html');
 })->name('rules');
 
-$DevWifi->get(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
-    $DevWifi->render('manager.html', array('entries' => $DevWifi->entries->getAll(), 'kupa' => 'dupa'));
-})->name('manager');
+$DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
+    $req = $DevWifi->request;
+    if($req->isPost())
+    {
+        if($req->post('scope') == 'entries')
+            $entry = $DevWifi->entries->get($req->post('mac'));
+        else
+            $entry = $DevWifi->blacklist->get($req->post('mac'));
+
+        if(!$entry instanceof Entry)
+            $DevWifi->view->appendData(array(
+                'error' => 'Entry with MAC '.$req->post('mac').' does not exist!'
+            ));
+        else
+        {
+            if($req->post('action') == 'delete' && $req->post('scope') == 'entries')
+            {
+                $DevWifi->entries->delete($entry);
+                $DevWifi->entries->save();
+            }
+            elseif($req->post('action') == 'blacklist' && $req->post('scope') == 'entries')
+            {
+                $DevWifi->blacklist->set($entry);
+                $DevWifi->blacklist->save();
+                $DevWifi->entries->delete($entry);
+                $DevWifi->entries->save();
+            }
+            elseif($req->post('action') == 'readd' && $req->post('scope') == 'blacklist')
+            {
+                $DevWifi->entries->set($entry);
+                $DevWifi->entries->save();
+                $DevWifi->blacklist->delete($entry);
+                $DevWifi->blacklist->save();
+            }
+            elseif($req->post('action') == 'delete' && $req->post('scope') == 'blacklist')
+            {
+                $DevWifi->blacklist->delete($entry);
+                $DevWifi->blacklist->save();
+            }
+        }
+    }
+    $DevWifi->render('manager.html', array(
+        'entries' => $DevWifi->entries->getAll(),
+        'blacklist' => $DevWifi->blacklist->getAll()
+    ));
+})->via('GET', 'POST')->name('manager');
 
 $DevWifi->get(ROUTE_PREFIX.'/debug', function() use($DevWifi) {
-    //var_dump($DevWifi->entries->getAll());
-    echo $DevWifi->entries->getAll()['a8:26:d9:ca:22:58']->mac;
+    var_dump($DevWifi->entries->getAll());
+    //echo $DevWifi->entries->getAll()['a8:26:d9:ca:22:58']->mac;
 });
 
 //////////////////////////////////////////////////////////////////////
