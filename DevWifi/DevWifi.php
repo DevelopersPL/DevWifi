@@ -33,7 +33,7 @@
 $loader = require APP_ROOT . '/vendor/autoload.php';
 $loader->setPsr4('DevWifi\\', APP_ROOT . '/DevWifi');
 
-use \DevWifi\Entry;
+use  DevWifi\Entry;
 
 //////////////////////// CREATE Slim APPLICATION //////////////////////////////////
 $DevWifi = new \Slim\Slim(array(
@@ -71,6 +71,7 @@ $view->appendData(array(
 // (Singleton resources retrieve the same log resource definition each time)
 $DevWifi->container->singleton('log', function () {
     $log = new \Monolog\Logger('DevWifi');
+    $log->pushHandler(new \Monolog\Handler\StreamHandler(APP_ROOT . '/logs/error.log', \Monolog\Logger::ERROR));
     $log->pushHandler(new \Monolog\Handler\RotatingFileHandler(APP_ROOT . '/logs/events.log', \Monolog\Logger::INFO));
     return $log;
 });
@@ -125,8 +126,106 @@ $DevWifi->container->singleton('blacklist', function () {
 
 //////////////////////////// ROUTES //////////////////////////////////
 $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
-    $DevWifi->render('form.html');
-    $DevWifi->log->addInfo('Something worth logging just happened!');
+    $req = $DevWifi->request;
+    if($req->isPost())
+    {
+        try {
+            if($req->post('action') == 'add')
+            {
+                $entry = new Entry();
+                $entry->firstName = $req->post('firstName');
+                $entry->lastName = $req->post('lastName');
+                if( $req->post('type') == 'u' )
+                    $entry->grade = $req->post('grade');
+                $entry->mac = $req->post('mac');
+                $entry->device = $req->post('device');
+
+                if($req->post('rules') != 'on')
+                    throw new InputErrorException('You need to accept Terms & Conditions!', 400);
+
+                if($DevWifi->entries->get($entry->mac) instanceof Entry)
+                    throw new InputErrorException('This device already has access!', 400);
+
+                if($DevWifi->blacklist->get($entry->mac) instanceof Entry)
+                    throw new InputErrorException('This device is blacklisted!', 400);
+
+                $DevWifi->entries->set($entry);
+                $DevWifi->entries->save();
+                $DevWifi->log->addInfo('New device added', $entry->toArray());
+
+                // TODO: send email
+
+                $DevWifi->view->appendData(array(
+                    'key' => $entry->key
+                ));
+            }
+            elseif($req->post('action') == 'key')
+            {
+                $entry = $DevWifi->entries->get($req->post('mac'));
+                if(!($entry instanceof Entry))
+                    throw new InputErrorException('This device is not registered!', 400);
+
+                if($entry->firstName != $req->post('firstName'))
+                    throw new InputErrorException('First name does not match!', 400);
+
+                if($entry->lastName != $req->post('lastName'))
+                    throw new InputErrorException('Last name does not match!', 400);
+
+                if($req->post('rules') != 'on')
+                    throw new InputErrorException('You need to accept Terms & Conditions!', 400);
+
+                $entry->generateKey();
+
+                $DevWifi->entries->set($entry);
+                $DevWifi->entries->save();
+                $DevWifi->log->addInfo('Device key modified', $entry->toArray());
+
+                // TODO: send email
+
+                $DevWifi->view->appendData(array(
+                    'new_key' => $entry->key
+                ));
+            }
+            elseif($req->post('action') == 'delete')
+            {
+                $entry = $DevWifi->entries->get($req->post('mac'));
+                if(!($entry instanceof Entry))
+                    throw new InputErrorException('This device is not registered!', 400);
+
+                if($entry->firstName != $req->post('firstName'))
+                    throw new InputErrorException('First name does not match!', 400);
+
+                if($entry->lastName != $req->post('lastName'))
+                    throw new InputErrorException('Last name does not match!', 400);
+
+                $DevWifi->entries->delete($entry);
+                $DevWifi->entries->save();
+                $DevWifi->log->addInfo('Device deleted', $entry->toArray());
+
+                $DevWifi->view->appendData(array(
+                    'deleted' => true
+                ));
+            }
+        } catch(InputErrorException $e)
+        {
+            $DevWifi->view->appendData(array(
+                'error' => $e->getMessage()
+            ));
+        }
+        $DevWifi->view->appendData(array(
+            'pane' => $req->post('action')
+        ));
+    }
+    $DevWifi->render('form.html', array(
+        'type' => $req->post('type'),
+        'firstName' => $req->post('firstName'),
+        'lastName' => $req->post('lastName'),
+        'grade' => $req->post('grade'),
+        'mac' => $req->post('mac'),
+        'device' => $req->post('device'),
+        'email' => $req->post('email'),
+        'rules' => $req->post('rules')
+    ));
 })->via('GET', 'POST')->name('home');
 
 $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
@@ -142,7 +241,7 @@ $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi)
         else
             $entry = $DevWifi->blacklist->get($req->post('mac'));
 
-        if(!$entry instanceof Entry)
+        if(!($entry instanceof Entry))
             $DevWifi->view->appendData(array(
                 'error' => 'Entry with MAC '.$req->post('mac').' does not exist!'
             ));
@@ -180,10 +279,11 @@ $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi)
     ));
 })->via('GET', 'POST')->name('manager');
 
-$DevWifi->get(ROUTE_PREFIX.'/debug', function() use($DevWifi) {
-    var_dump($DevWifi->entries->getAll());
-    //echo $DevWifi->entries->getAll()['a8:26:d9:ca:22:58']->mac;
-});
+if(ENABLE_DEBUG)
+    $DevWifi->get(ROUTE_PREFIX.'/debug', function() use($DevWifi) {
+        var_dump($DevWifi->entries->getAll());
+        //echo $DevWifi->entries->getAll()['a8:26:d9:ca:22:58']->mac;
+    });
 
 //////////////////////////////////////////////////////////////////////
 // all done, any code after this call will not matter to the request

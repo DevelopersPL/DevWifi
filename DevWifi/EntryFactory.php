@@ -62,7 +62,9 @@ class EntryFactory {
 
     public function get($mac)
     {
-        return $this->entries[$mac];
+        $mac = strtolower($mac);
+        if(array_key_exists($mac, $this->entries))
+            return $this->entries[$mac];
     }
 
     public function getAll()

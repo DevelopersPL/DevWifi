@@ -4,24 +4,34 @@
 {% block content %}
 <div class="jumbotron">
     <div class="text-center">
-        <span class="h2">Formularz dodawania urządzenia do sieci bezprzewodowej</span>
+        <span class="h2">Formularz dodawania/usuwania urządzenia do sieci bezprzewodowej</span>
     </div>
 
     <div class="form-content">
         <ul class="nav nav-tabs" id="myTab">
-            <li class="active"><a href="#main">Dodawanie urządzenia</a></li>
-            <li><a href="#edit">Edycja urządzenia</a></li>
+            <li class="{% if pane == 'add' or pane is not defined %}active{% endif %}"><a href="#add">Dodawanie urządzenia</a></li>
+            <li class="{% if pane == 'key' %}active{% endif %}"><a href="#key">Zmiana/odzyskanie klucza</a></li>
+            <li class="{% if pane == 'delete' %}active{% endif %}"><a href="#delete">Usuwanie urządzenia</a></li>
         </ul>
 
         <div class="tab-content">
-            <div class="tab-pane active" id="main">
-                <form role="form" class="form-horizontal">
+
+            <div class="tab-pane {% if pane == 'add' or pane is not defined %}active{% endif %}" id="add">
+                <form method="post" role="form" class="form-horizontal">
                     <input type="hidden" name="action" value="add" />
 
-                    {% if error is defined %}
+                    {% if error is defined and pane == 'add' %}
                     <div class="alert alert-danger">
                         <div class="text-center">
                             {{error}}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if key is defined %}
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Twoje urządzenie zostało dodane do sieci. Twój klucz WEP to: <strong>{{key}}</strong>
                         </div>
                     </div>
                     {% endif %}
@@ -31,35 +41,42 @@
                         <div class="row">
                             <div class="col-xs-2">
                                 <select tabindex="1" id="inputType" name="type" class="form-control">
-                                    <option selected value="u">Uczeń</option>
-                                    <option value="n">Nauczyciel</option>
-                                    <option value="p">Inny pracownik</option>
+                                    <option {% if type == 'u' %}selected{% endif %} value="u">Uczeń</option>
+                                    <option {% if type == 'n' %}selected{% endif %} value="n">Nauczyciel</option>
+                                    <option {% if type == 'p' %}selected{% endif %} value="p">Inny pracownik</option>
                                 </select>
                             </div>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" name="firstName" id="firstName" required placeholder="Imię" value="{{firstName}}">
+                            </div>
                             <div class="col-xs-4">
-                                <input type="text" class="form-control" name="fullname" id="fullname" required placeholder="Imię i nazwisko">
+                                <input type="text" class="form-control" name="lastName" id="lastName" required placeholder="Nazwisko" value="{{lastName}}">
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="inputClass" class="col-sm-2 control-label">Klasa</label>
+                        <label for="inputGrade" class="col-sm-2 control-label">Klasa</label>
                         <div class="col-sm-2">
-                            <input type="text" class="form-control" name="class" id="inputClass" placeholder="np. 3K">
+                            <input type="text" class="form-control" name="grade" id="inputGrade" placeholder="np. 3K" value="{{grade}}">
                         </div>
                     </div>
 
                     <div class="form-group">
-                        <label for="inputMac" class="col-sm-2 control-label">MAC</label>
+                        <label for="inputMac" class="col-sm-2 control-label">Urządzenie</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="mac" id="inputMac" required placeholder="Adres MAC" value="{{mac}}">
+                        </div>
+
                         <div class="col-sm-4">
-                            <input type="text" class="form-control" name="mac" id="inputMac" required placeholder="Adres MAC">
+                            <input type="text" class="form-control" name="device" id="inputDevice" required placeholder="Nazwa urządzenia" value="{{device}}">
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label for="inputEmail" class="col-sm-2 control-label">Adres e-mail</label>
                         <div class="col-sm-4">
-                            <input type="email" class="form-control" name="email" id="inputEmail" required placeholder="opcjonalnie - wyślemy Ci Twój klucz">
+                            <input type="email" class="form-control" name="email" id="inputEmail" placeholder="opcjonalnie - wyślemy Ci Twój klucz" value="{{email}}">
                         </div>
                     </div>
 
@@ -67,7 +84,7 @@
                         <div class="col-sm-offset-2 col-sm-10">
                             <div class="checkbox">
                                 <label>
-                                    <input type="checkbox"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci
+                                    <input type="checkbox" {% if rules == 'on' %}checked{% endif %} name="rules"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci
                                 </label>
                             </div>
                         </div>
@@ -75,7 +92,123 @@
                     <button type="submit" class="btn btn-primary">Wyślij</button>
                 </form>
             </div>
-            <div class="tab-pane" id="edit">...</div>
+
+            <div class="tab-pane {% if pane == 'key' %}active{% endif %}" id="key">
+                <form method="post" role="form" class="form-horizontal">
+                    <input type="hidden" name="action" value="key" />
+
+                    {% if error is defined and pane == 'key' %}
+                    <div class="alert alert-danger">
+                        <div class="text-center">
+                            {{error}}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if new_key is defined %}
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Twój nowy klucz WEP to: <strong>{{new_key}}</strong>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="EinputType" class="col-sm-2 control-label">Dane osobowe</label>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <select tabindex="1" id="EinputType" name="type" class="form-control">
+                                    <option {% if type == 'u' %}selected{% endif %} value="u">Uczeń</option>
+                                    <option {% if type == 'n' %}selected{% endif %} value="n">Nauczyciel</option>
+                                    <option {% if type == 'p' %}selected{% endif %} value="p">Inny pracownik</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" name="firstName" id="EfirstName" required placeholder="Imię" value="{{firstName}}">
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="text" class="form-control" name="lastName" id="ElastName" required placeholder="Nazwisko" value="{{lastName}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="EinputMac" class="col-sm-2 control-label">Urządzenie</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="mac" id="EinputMac" required placeholder="Adres MAC" value="{{mac}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="EinputEmail" class="col-sm-2 control-label">Adres e-mail</label>
+                        <div class="col-sm-4">
+                            <input type="email" class="form-control" name="email" id="EinputEmail" placeholder="opcjonalnie - wyślemy Ci Twój klucz" value="{{email}}">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="col-sm-offset-2 col-sm-10">
+                            <div class="checkbox">
+                                <label>
+                                    <input type="checkbox" {% if rules == 'on' %}checked{% endif %} name="rules"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Wyślij</button>
+                </form>
+            </div>
+
+            <div class="tab-pane {% if pane == 'delete' %}active{% endif %}" id="delete">
+                <form method="post" role="form" class="form-horizontal">
+                    <input type="hidden" name="action" value="delete" />
+
+                    {% if error is defined and pane == 'delete' %}
+                    <div class="alert alert-danger">
+                        <div class="text-center">
+                            {{error}}
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    {% if deleted is defined %}
+                    <div class="alert alert-success">
+                        <div class="text-center">
+                            Urządzenie zostało wyrejestrowane z sieci.
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="form-group">
+                        <label for="DinputType" class="col-sm-2 control-label">Dane osobowe</label>
+                        <div class="row">
+                            <div class="col-xs-2">
+                                <select tabindex="1" id="DinputType" name="type" class="form-control">
+                                    <option {% if type == 'u' %}selected{% endif %} value="u">Uczeń</option>
+                                    <option {% if type == 'n' %}selected{% endif %} value="n">Nauczyciel</option>
+                                    <option {% if type == 'p' %}selected{% endif %} value="p">Inny pracownik</option>
+                                </select>
+                            </div>
+                            <div class="col-xs-3">
+                                <input type="text" class="form-control" name="firstName" id="DfirstName" required placeholder="Imię" value="{{firstName}}">
+                            </div>
+                            <div class="col-xs-4">
+                                <input type="text" class="form-control" name="lastName" id="DlastName" required placeholder="Nazwisko" value="{{lastName}}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="DinputMac" class="col-sm-2 control-label">Urządzenie</label>
+                        <div class="col-sm-3">
+                            <input type="text" class="form-control" name="mac" id="DinputMac" required placeholder="Adres MAC" value="{{mac}}">
+                        </div>
+                    </div>
+
+                    <button type="submit" class="btn btn-danger">Wyrejestruj z sieci</button>
+                </form>
+            </div>
+
         </div>
     </div>
 </div>

@@ -47,27 +47,22 @@ class Entry {
 
     protected $key;
 
-    public function __construct($raw)
+    public function __construct($raw = null)
     {
         if($raw)
             $this->fromRaw($raw);
         else
         {
             $this->date = new \DateTime();
-
-            // generate WEP key
-            $alphabet = "abcdef0123456789";
-            for ($i = 0; $i < 10; $i++) {
-                $n = rand(0, strlen($alphabet)-1);
-                $this->key .= $alphabet[$n];
-            }
+            $this->grade = '--';
+            $this->generateKey();
         }
     }
 
     public function __get( $property )
     {
         if( ! is_callable( array($this,'get'.ucfirst((string)$property)) ) )
-            throw new BadPropertyException($this, (string)$property);
+            throw new \Exception((string)$property);
 
         return call_user_func( array($this,'get'.ucfirst((string)$property)));
     }
@@ -75,14 +70,33 @@ class Entry {
     public function __set( $property, $value )
     {
         if( ! is_callable( array($this,'set'.ucfirst((string)$property)) ) )
-            throw new BadPropertyException($this, (string)$property);
+            throw new \Exception((string)$property);
 
         call_user_func( array($this,'set'.ucfirst((string)$property)), $value );
+    }
+
+    public function generateKey()
+    {
+        $this->key = '';
+        // generate WEP key
+        $alphabet = "abcdef0123456789";
+        for ($i = 0; $i < 10; $i++) {
+            $n = rand(0, strlen($alphabet)-1);
+            $this->key .= $alphabet[$n];
+        }
     }
 
     public function isValid()
     {
         return ($this->mac && $this->firstName && $this->lastName && $this->grade && $this->device && $this->date && $this->key);
+    }
+
+    public function toArray()
+    {
+        $array = array();
+        foreach($this as $key => $value)
+            $array[$key] = $value;
+        return $array;
     }
 
     public function toRaw()
@@ -124,7 +138,7 @@ class Entry {
     public function setFirstName($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/([a-zA-Z]{1-15}/'))) )
+            array('options' => array('regexp' => '/[a-zA-Z]{1,15}/'))) )
             throw new \InputErrorException('First name is not valid.', 400);
 
         $this->firstName = $v;
@@ -138,7 +152,7 @@ class Entry {
     public function setLastName($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/([a-zA-Z]{1-20}/'))) )
+            array('options' => array('regexp' => '/[a-zA-Z]{1,20}/'))) )
             throw new \InputErrorException('Last name is not valid.', 400);
 
         $this->lastName = $v;
@@ -152,7 +166,7 @@ class Entry {
     public function setGrade($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/([a-zA-Z0-9]{1-4}/'))) )
+            array('options' => array('regexp' => '/[a-zA-Z0-9]{1,4}/'))) )
             throw new \InputErrorException('Grade is not valid.', 400);
 
         $this->grade = $v;
@@ -166,7 +180,7 @@ class Entry {
     public function setDevice($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/([a-zA-Z]{1-10}/'))) )
+            array('options' => array('regexp' => '/[a-zA-Z]{1,10}/'))) )
             throw new \InputErrorException('Device name is not valid.', 400);
 
         $this->device = $v;
