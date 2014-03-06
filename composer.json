@@ -16,6 +16,7 @@
         "slim/slim": "*",
         "slim/views": "*",
         "twig/twig": "*",
-        "monolog/monolog": "*"
+        "monolog/monolog": "*",
+        "eoghanobrien/php-simple-mail": "*"
     }
 }

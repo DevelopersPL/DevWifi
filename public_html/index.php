@@ -37,10 +37,15 @@ defined('APP_ROOT') or define('APP_ROOT', realpath('..'));
 defined('ENABLE_DEBUG') or define('ENABLE_DEBUG', false);
 defined('DB_FILENAME') or define('DB_FILENAME', './client.cfg');
 defined('DB_BLACKLIST_FILENAME') or define('DB_BLACKLIST_FILENAME', './blacklist.cfg');
-
 defined('ROUTE_PREFIX') or define('ROUTE_PREFIX', '');
+
+// AUTHENTICATION - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
 defined('MANAGER_USER') or define('MANAGER_USER', 'manager');
-defined('MANAGER_PASS') or define('MANAGER_PASS', 'haxxed');
+defined('MANAGER_PASS') or define('MANAGER_PASS', 'haxxed'); // you might want to change this
+
+// MAILER - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
+defined('MAILER_FROM') or define('MAILER_FROM', false); // this is your email address
+defined('MAILER_BCC') or define('MAILER_BCC', false); // this email gets all messages BCC'ed
 
 // DO NOT EDIT
 define('PUBLIC_HTML_PATH', realpath('.'));

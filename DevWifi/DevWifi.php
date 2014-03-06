@@ -63,7 +63,8 @@ $view->parserOptions = array(
 );
 
 $view->appendData(array(
-    'ROUTE_PREFIX' => ROUTE_PREFIX
+    'ROUTE_PREFIX' => ROUTE_PREFIX,
+    'BASEURL' => $DevWifi->request->getUrl()
 ));
 
 /////////////////////////// SETUP LOGGER //////////////////////////////
@@ -74,6 +75,20 @@ $DevWifi->container->singleton('log', function () {
     $log->pushHandler(new \Monolog\Handler\StreamHandler(APP_ROOT . '/logs/error.log', \Monolog\Logger::ERROR));
     $log->pushHandler(new \Monolog\Handler\RotatingFileHandler(APP_ROOT . '/logs/events.log', \Monolog\Logger::INFO));
     return $log;
+});
+
+/////////////////////////// SETUP MAILER //////////////////////////////
+$DevWifi->container->singleton('mailer', function () {
+    $mailer = new SimpleMail();
+
+    if(MAILER_FROM)
+        $mailer->setFrom(MAILER_FROM);
+
+    if(MAILER_BCC)
+        $mailer->addMailHeader('Bcc', MAILER_BCC);
+
+    $mailer->addGenericHeader('Content-Type', 'text; charset="utf-8"');
+    return $mailer;
 });
 
 //////////////// DEFINE AUTHENTICATION MIDDLEWARE /////////////////////
@@ -153,7 +168,22 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 $DevWifi->entries->save();
                 $DevWifi->log->addInfo('New device added', $entry->toArray());
 
-                // TODO: send email
+                // send email
+                if($req->post('email'))
+                {
+                    // WE APPEND DATA GLOBALLY BECAUSE 5 LINES BELOW, PASSING EXTRA DATA DOES NOT WORK
+                    $DevWifi->view->appendData(array('entry' => $entry));
+                    $send = $DevWifi->mailer
+                        ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
+                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
+                        ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
+                        ->send();
+
+                    if(!$send)
+                        $DevWifi->view->appendData(array(
+                            'error' => 'Wysłanie wiadomości email na adres '.$req->post('email').' nie powiodło się!'
+                        ));
+                }
 
                 $DevWifi->view->appendData(array(
                     'key' => $entry->key
@@ -180,7 +210,22 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 $DevWifi->entries->save();
                 $DevWifi->log->addInfo('Device key modified', $entry->toArray());
 
-                // TODO: send email
+                // send email
+                if($req->post('email'))
+                {
+                    // WE APPEND DATA GLOBALLY BECAUSE 5 LINES BELOW, PASSING EXTRA DATA DOES NOT WORK
+                    $DevWifi->view->appendData(array('entry' => $entry));
+                    $send = $DevWifi->mailer
+                        ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
+                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
+                        ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
+                        ->send();
+
+                    if(!$send)
+                        $DevWifi->view->appendData(array(
+                            'error' => 'Wysłanie wiadomości email na adres '.$req->post('email').' nie powiodło się!'
+                        ));
+                }
 
                 $DevWifi->view->appendData(array(
                     'new_key' => $entry->key
