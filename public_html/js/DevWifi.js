@@ -9,6 +9,28 @@ $(function() {
 
     // masked input
     $.mask.definitions['h'] = "[A-Fa-f0-9]";
-    if($('#inputMac').length)
-        $('#inputMac').mask("hh:hh:hh:hh:hh:hh");
+    if ($('#inputMac, #DinputMac, #EinputMac').length)
+        $('#inputMac, #DinputMac, #EinputMac').mask("hh:hh:hh:hh:hh:hh");
+
+
+    if ($('#inputGrade').length)
+        $('#inputGrade').mask("9?aa");
+
+    // grade show/hide animation
+    $( "#inputType" ).change(function() {
+        if ($( this ).val() != 'u') {
+            $(".grade").slideUp();
+        } else {
+            $(".grade").slideDown();
+        }
+    });
+
+    // loading-state button
+    $('form').submit(function () {
+        if ($(this).valid()) {
+            $('.submitbtn').button('loading');
+            return true;
+        }
+    });
+
 });

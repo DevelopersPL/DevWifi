@@ -7,11 +7,12 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>ZSE-E Radomsko Wi-Fi</title>
+    <title>{{APP_TITLE}}</title>
     <link rel="stylesheet" href="{{ROUTE_PREFIX}}/css/bootstrap.min.css" media="screen">
     <link rel="stylesheet" href="{{ROUTE_PREFIX}}/css/bootstrap-theme.min.css" media="screen">
     <link rel="stylesheet" type="text/css" href="{{ROUTE_PREFIX}}/css/DevWifi.css" />
-    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/jquery-2.1.0.min.js"></script>
+    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/jquery-2.1.1.min.js"></script>
+    <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/jquery.validate.min.js"></script>
     <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/jquery.maskedinput.min.js"></script>
     <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="{{ROUTE_PREFIX}}/js/DevWifi.js"></script>
@@ -33,12 +34,13 @@
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
             </button>
-            <span class="navbar-brand nav-logo"></span> <a class="navbar-brand" href="{{ urlFor('home') }}">ZSE-E Radomsko Wi-Fi</a>
+            <span class="navbar-brand nav-logo"></span> <a class="navbar-brand" href="{{ urlFor('home') }}">{{APP_TITLE}}</a>
         </div>
         <div class="navbar-collapse collapse">
             <ul class="nav navbar-nav navbar-right">
                 <li{% if active_page== 'home' %} class="active"{% endif %}><a href="{{ urlFor('home') }}">Strona główna</a></li>
                 <li{% if active_page== 'rules' %} class="active"{% endif %}><a href="{{ urlFor('rules') }}">Regulamin</a></li>
+                {% if MSG_ENABLED== true %}<li{% if active_page== 'contact' %} class="active"{% endif %}><a href="{{ urlFor('contact') }}">Kontakt</a></li>{% endif %}
             </ul>
         </div><!--/.nav-collapse -->
     </div>

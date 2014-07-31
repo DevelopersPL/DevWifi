@@ -1,0 +1,56 @@
+{% extends "layout.html" %}
+{% set active_page = 'contact' %}
+
+{% block content %}
+<div class="well well-lg">
+
+    <div class="text-center">
+        <span class="h2">Wyślij wiadomość do administratora</span>
+    </div>
+
+    <form role="form" method="post">
+        <input type="hidden" name="action" value="contact" />
+
+        {% if error is defined %}
+        <div class="alert alert-danger">
+            <div class="text-center">
+                {{error}}
+            </div>
+        </div>
+        {% endif %}
+
+        {% if sent is defined %}
+        <div class="alert alert-success">
+            <div class="text-center">
+                Wiadomość została wysłana pomyślnie
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="inputEmail">Adres e-mail</label>
+            <input tabindex="1" type="email" class="form-control" id="inputEmail" required placeholder="Adres e-mail" value="{{email}}">
+        </div>
+
+        <div class="form-group">
+            <label for="inputName">Imię i nazwisko</label>
+            <input tabindex="2" type="text" class="form-control" id="inputName" required placeholder="Imię i nazwisko" value="{{name}}">
+        </div>
+
+        <div class="form-group">
+            <label for="inputMessage">Treść wiadomości</label>
+            <textarea tabindex="3" class="form-control field span12" rows="6" id="inputMessage" required>{{message}}</textarea>
+        </div>
+
+        <div class="checkbox">
+            <label>
+                <input type="checkbox" {% if rules == 'on' %}checked{% endif %} required name="rules"> Akceptuję <a href="{{ urlFor('rules') }}" title="regulamin">regulamin</a> dostępu do sieci i wyrażam zgodę na przetwarzanie danych.
+            </label>
+        </div>
+
+        <button type="submit" class="btn btn-primary submitbtn form-control"{% if sent is defined %} disabled {% endif %}data-loading-text="Przetwarzanie...">Wyślij wiadomość do administratora</button>
+
+    </form>
+
+</div>
+{% endblock %}

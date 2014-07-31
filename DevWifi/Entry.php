@@ -39,9 +39,13 @@ class Entry {
 
     protected $lastName;
 
+    protected $type;
+
     protected $grade;
 
     protected $device;
+
+    protected $email;
 
     protected $date;
 
@@ -55,7 +59,6 @@ class Entry {
         {
             $this->date = new \DateTime();
             $this->grade = '--';
-            $this->generateKey();
         }
     }
 
@@ -75,14 +78,20 @@ class Entry {
         call_user_func( array($this,'set'.ucfirst((string)$property)), $value );
     }
 
-    public function generateKey()
+    public function generateKey($static_wep = false)
     {
         $this->key = '';
-        // generate WEP key
-        $alphabet = "abcdef0123456789";
-        for ($i = 0; $i < 10; $i++) {
-            $n = rand(0, strlen($alphabet)-1);
-            $this->key .= $alphabet[$n];
+
+        if ($static_wep)
+            // use static WEP key
+            $this->key = 'static';
+        else {
+            // generate WEP key
+            $alphabet = "abcdef0123456789";
+            for ($i = 0; $i < 10; $i++) {
+                $n = rand(0, strlen($alphabet)-1);
+                $this->key .= $alphabet[$n];
+            }
         }
     }
 
@@ -104,7 +113,7 @@ class Entry {
         if(!$this->isValid())
             throw new \InputErrorException('Entry is not valid, cannot serialize to raw.', 503);
 
-        return '192.168.99. 300/64 auto 100 '.$this->mac.' 0 0 WAN1 '.$this->firstName.'.'.$this->lastName
+        return '192.168.99. 300/64 auto 100 '.$this->mac.' 0 0 WAN1 '.$this->replacePolChars($this->firstName).'.'.$this->replacePolChars($this->lastName)
                 .'.'.$this->grade.'.'.$this->device.'.'.$this->date->format('d.m.Y').'.'.$this->key.' 0 0 0 0';
     }
 
@@ -124,8 +133,8 @@ class Entry {
     public function setMac($mac)
     {
         if( !filter_var($mac, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/([a-fA-F0-9]{2}[:|\-]?){6}/'))) )
-            throw new \InputErrorException('MAC address is not valid.', 400);
+            array('options' => array('regexp' => '/^([a-f0-9]{2}[:|\-]?){6}$/i'))))
+            throw new \InputErrorException('Adres MAC nie jest poprawny.', 400);
 
         $this->mac = strtolower($mac);
     }
@@ -137,9 +146,9 @@ class Entry {
 
     public function setFirstName($v)
     {
-        if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/[a-zA-Z]{1,15}/'))) )
-            throw new \InputErrorException('First name is not valid.', 400);
+        if( !filter_var(self::replacePolChars($v), FILTER_VALIDATE_REGEXP,
+            array('options' => array('regexp' => '/^[a-z]{0,25}$/i'))) )
+            throw new \InputErrorException('Imię nie jest poprawne.', 400);
 
         $this->firstName = $v;
     }
@@ -151,9 +160,9 @@ class Entry {
 
     public function setLastName($v)
     {
-        if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/[a-zA-Z]{1,20}/'))) )
-            throw new \InputErrorException('Last name is not valid.', 400);
+        if( !filter_var(self::replacePolChars($v), FILTER_VALIDATE_REGEXP,
+            array('options' => array('regexp' => '/^[a-z]{1,25}$/i'))) )
+            throw new \InputErrorException('Nazwisko nie jest poprawne.', 400);
 
         $this->lastName = $v;
     }
@@ -163,11 +172,25 @@ class Entry {
         return $this->lastName;
     }
 
+    public function setType($v)
+    {
+        if( !filter_var($v, FILTER_VALIDATE_REGEXP,
+            array('options' => array('regexp' => '/^(u|n|p)$/'))) )
+            throw new \InputErrorException('Rodzaj klienta nie jest poprawny.', 400);
+
+        $this->type = $v;
+    }
+
+    public function getType()
+    {
+        return $this->type;
+    }
+
     public function setGrade($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/[a-zA-Z0-9]{1,4}/'))) )
-            throw new \InputErrorException('Grade is not valid.', 400);
+            array('options' => array('regexp' => '/^[0-9]{1}([a-z]{0,2})?$/'))) )
+            throw new \InputErrorException('Klasa nie jest poprawna.', 400);
 
         $this->grade = $v;
     }
@@ -180,8 +203,8 @@ class Entry {
     public function setDevice($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/[a-zA-Z]{1,10}/'))) )
-            throw new \InputErrorException('Device name is not valid.', 400);
+            array('options' => array('regexp' => '/^(pc|tel|tab|oth)$/'))) )
+            throw new \InputErrorException('Typ urządzenia nie jest poprawny.', 400);
 
         $this->device = $v;
     }
@@ -189,6 +212,19 @@ class Entry {
     public function getDevice()
     {
         return $this->device;
+    }
+
+    public function setEmail($v)
+    {
+        if( !filter_var($v, FILTER_VALIDATE_EMAIL) )
+            throw new \InputErrorException('Adres e-mail nie jest poprawny.', 400);
+
+        $this->email = $v;
+    }
+
+    public function getEmail()
+    {
+        return $this->email;
     }
 
     public function getDate()
@@ -199,5 +235,31 @@ class Entry {
     public function getKey()
     {
         return $this->key;
+    }
+
+    public static function replacePolChars($input)
+    {
+        // replace polish letters
+        $replacements = array(
+            'ą' =>  'a',
+            'Ą' =>  'A',
+            'ć' =>  'c',
+            'Ć' =>  'C',
+            'ę' =>  'e',
+            'Ę' =>  'E',
+            'ł' =>  'l',
+            'Ł' =>  'L',
+            'ń' =>  'n',
+            'Ń' =>  'N',
+            'ó' =>  'o',
+            'Ó' =>  'O',
+            'ś' =>  's',
+            'Ś' =>  'S',
+            'ż' =>  'z',
+            'Ż' =>  'Z',
+            'ź' =>  'z',
+            'Ź' =>  'Z',
+        );
+        return str_replace(array_keys($replacements), array_values($replacements), $input);
     }
 }

@@ -40,18 +40,23 @@ defined('DB_BLACKLIST_FILENAME') or define('DB_BLACKLIST_FILENAME', './blacklist
 defined('ROUTE_PREFIX') or define('ROUTE_PREFIX', '');
 
 // AUTHENTICATION - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
-defined('MANAGER_USER') or define('MANAGER_USER', 'manager');
-defined('MANAGER_PASS') or define('MANAGER_PASS', 'haxxed'); // you might want to change this
+defined('MANAGER_USER') or define('MANAGER_USER', 'admin');
+defined('MANAGER_PASS') or define('MANAGER_PASS', 'demo'); // you might want to change this
 
 // MAILER - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
-defined('MAILER_FROM') or define('MAILER_FROM', false); // this is your email address
-defined('MAILER_BCC') or define('MAILER_BCC', false); // this email gets all messages BCC'ed
+defined('MAILER_FROM') or define('MAILER_FROM', false); // this is your email address (or false)
+defined('MAILER_BCC') or define('MAILER_BCC', false); // this email gets all messages BCC'ed (or false)
 
+// APP SETTINGS - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
+defined('APP_DISABLED') or define('APP_DISABLED', false); // enter maintenance message to disable app (or false to enable)
+defined('MSG_ENABLED') or define('MSG_ENABLED', true); // enable admin-contact page?
+defined('APP_TITLE') or define('APP_TITLE', 'DevWifi'); // your web-app title
+defined('STATIC_WEP') or define('STATIC_WEP', false); // set WEP key to disable auto-generate (or false to static)
+defined('SHOW_WEP') or define('SHOW_WEP', true); // show a WEP key after submit the form?
 // DO NOT EDIT
 define('PUBLIC_HTML_PATH', realpath('.'));
 
 // IF YOU INSTALL PUBLIC_HTML IN A SUBDIRECTORY, FOR EXAMPLE: http://example.com/some/dir/index.php
 // THEN YOU NEED TO SET APP_ROOT ACCORDINGLY. IN THIS CASE TO '../../../DevWifi'
-
 chdir(APP_ROOT);
 require './DevWifi/DevWifi.php';
