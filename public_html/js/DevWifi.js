@@ -17,6 +17,9 @@ $(function() {
         $('#inputGrade').mask("9?aa");
 
     // grade show/hide animation
+    if ($( "#inputType" ).val() != 'u')
+        $(".grade").hide();
+
     $( "#inputType" ).change(function() {
         if ($( this ).val() != 'u') {
             $(".grade").slideUp();

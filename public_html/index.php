@@ -44,12 +44,13 @@ defined('MANAGER_USER') or define('MANAGER_USER', 'admin');
 defined('MANAGER_PASS') or define('MANAGER_PASS', 'demo'); // you might want to change this
 
 // MAILER - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
+defined('MSG_ENABLED') or define('MSG_ENABLED', true); // enable admin-contact page?
+defined('ADMIN_EMAIL') or define('ADMIN_EMAIL', ''); // you might want to change this
 defined('MAILER_FROM') or define('MAILER_FROM', false); // this is your email address (or false)
 defined('MAILER_BCC') or define('MAILER_BCC', false); // this email gets all messages BCC'ed (or false)
 
 // APP SETTINGS - DO NOT EDIT - PUT YOUR CUSTOMIZATIONS IN config.php
-defined('APP_DISABLED') or define('APP_DISABLED', false); // enter maintenance message to disable app (or false to enable)
-defined('MSG_ENABLED') or define('MSG_ENABLED', true); // enable admin-contact page?
+defined('APP_ENABLED') or define('APP_ENABLED', true); // enable your devwifi app?
 defined('APP_TITLE') or define('APP_TITLE', 'DevWifi'); // your web-app title
 defined('STATIC_WEP') or define('STATIC_WEP', false); // set WEP key to disable auto-generate (or false to static)
 defined('SHOW_WEP') or define('SHOW_WEP', true); // show a WEP key after submit the form?

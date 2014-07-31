@@ -1,8 +1,14 @@
-Witaj {{entry.firstName}},
+Witaj,
 
-Twoje urządzenie "{{entry.device}}" o adresie MAC: {{entry.mac|upper}} zostało zarejestrowane w naszej sieci dnia {{entry.date|date("d.m.Y")}}.
+Twoje urządzenie o adresie MAC: {{entry.mac|upper}} zostało zarejestrowane w naszej sieci dnia {{entry.date|date("d.m.Y")}}.
 
-Twój klucz WEP potrzebny do połączenia się z siecią Wi-Fi to {{entry.key}}. Ten klucz zadziała wyłącznie na tym urządzeniu.
+{% if SHOW_WEP== true %}
+Twój klucz WEP potrzebny do połączenia się z siecią Wi-Fi to: {% if entry.key == 'static' %}{{ STATIC_WEP }}{% else %}{{entry.key}}{% endif %}
+{% else %}
+Twój klucz WEP potrzebny do połączenia się z siecią Wi-Fi jest dostępny u administratora sieci.
+{% endif %}
+
+Klucz zadziała wyłącznie na tym urządzeniu.
 
 Korzystanie z naszej siecia podlega regulaminowi dostępnemu na stronie {{BASEURL}}{{urlFor('rules')}}.
 

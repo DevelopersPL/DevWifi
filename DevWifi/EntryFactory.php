@@ -86,7 +86,7 @@ class EntryFactory {
     {
         foreach($this->entries as $entry)
             if(!$entry->isValid())
-                throw new \InputErrorException('Entry '.$entry->mac.' is not valid!');
+                throw new \InputErrorException('Wpis z adresem '.$entry->mac.' nie jest prawidłowy.');
 
         rewind($this->handle);
         ftruncate($this->handle, 0);

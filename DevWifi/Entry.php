@@ -45,7 +45,7 @@ class Entry {
 
     protected $device;
 
-    protected $email;
+    protected $email = null;
 
     protected $date;
 
@@ -58,7 +58,6 @@ class Entry {
         else
         {
             $this->date = new \DateTime();
-            $this->grade = '--';
         }
     }
 
@@ -97,24 +96,28 @@ class Entry {
 
     public function isValid()
     {
-        return ($this->mac && $this->firstName && $this->lastName && $this->grade && $this->device && $this->date && $this->key);
+        return ($this->mac && $this->firstName && $this->lastName && $this->type && ($this->type == 'u' && $this->grade || $this->type != 'u') && $this->device && $this->date && $this->key);
     }
 
     public function toArray()
     {
         $array = array();
-        foreach($this as $key => $value)
+        foreach($this as $key => $value) {
+            if ($key == 'email')
+                $value = base64_decode($value);
+
             $array[$key] = $value;
+        }
         return $array;
     }
 
     public function toRaw()
     {
         if(!$this->isValid())
-            throw new \InputErrorException('Entry is not valid, cannot serialize to raw.', 503);
+            throw new \InputErrorException('Wpis nie jest prawidłowy. Nie można zapisać do pliku.', 503);
 
         return '192.168.99. 300/64 auto 100 '.$this->mac.' 0 0 WAN1 '.$this->replacePolChars($this->firstName).'.'.$this->replacePolChars($this->lastName)
-                .'.'.$this->grade.'.'.$this->device.'.'.$this->date->format('d.m.Y').'.'.$this->key.' 0 0 0 0';
+                .'.'.(($this->type == 'u') ? $this->grade : $this->type).'.'.$this->device.'.'.$this->date->format('d.m.Y').'.'.$this->key . (($this->email) ? '.'.$this->email : '') . ' 0 0 0 0';
     }
 
     public function fromRaw($raw)
@@ -124,10 +127,20 @@ class Entry {
         $combined = explode('.', $rawA[8]);
         $this->firstName = $combined[0];
         $this->lastName = $combined[1];
-        $this->grade = $combined[2];
+
+        if (in_array($combined[2], array('n', 'p'))) {
+            $this->type = $combined[2];
+        } else {
+            $this->type = 'u';
+            $this->grade = $combined[2];
+        }
+
         $this->device = $combined[3];
         $this->date = \DateTime::createFromFormat('d-m-Y', $combined[4].'-'.$combined[5].'-'.$combined[6]);
         $this->key = $combined[7];
+
+        if (isset($combined[8]))
+            $this->email = $combined[8];
     }
 
     public function setMac($mac)
@@ -150,7 +163,7 @@ class Entry {
             array('options' => array('regexp' => '/^[a-z]{0,25}$/i'))) )
             throw new \InputErrorException('Imię nie jest poprawne.', 400);
 
-        $this->firstName = $v;
+        $this->firstName = ucfirst(strtolower($v));
     }
 
     public function getFirstName()
@@ -164,7 +177,7 @@ class Entry {
             array('options' => array('regexp' => '/^[a-z]{1,25}$/i'))) )
             throw new \InputErrorException('Nazwisko nie jest poprawne.', 400);
 
-        $this->lastName = $v;
+        $this->lastName = ucfirst(strtolower($v));
     }
 
     public function getLastName()
@@ -189,10 +202,10 @@ class Entry {
     public function setGrade($v)
     {
         if( !filter_var($v, FILTER_VALIDATE_REGEXP,
-            array('options' => array('regexp' => '/^[0-9]{1}([a-z]{0,2})?$/'))) )
+            array('options' => array('regexp' => '/^[0-9]{1}([a-z]{0,2})?$/i'))) )
             throw new \InputErrorException('Klasa nie jest poprawna.', 400);
 
-        $this->grade = $v;
+        $this->grade = strtolower($v);
     }
 
     public function getGrade()
@@ -219,12 +232,12 @@ class Entry {
         if( !filter_var($v, FILTER_VALIDATE_EMAIL) )
             throw new \InputErrorException('Adres e-mail nie jest poprawny.', 400);
 
-        $this->email = $v;
+        $this->email = base64_encode(strtolower($v));
     }
 
     public function getEmail()
     {
-        return $this->email;
+        return base64_decode($this->email);
     }
 
     public function getDate()

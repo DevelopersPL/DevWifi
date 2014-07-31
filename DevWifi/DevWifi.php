@@ -62,7 +62,8 @@ $view->appendData(array(
     'BASEURL' => $DevWifi->request->getUrl(),
     'APP_TITLE' => APP_TITLE,
     'MSG_ENABLED' => MSG_ENABLED,
-    'SHOW_WEP' => SHOW_WEP
+    'SHOW_WEP' => SHOW_WEP,
+    'STATIC_WEP' => STATIC_WEP
 ));
 
 /////////////////////////// SETUP LOGGER //////////////////////////////
@@ -80,10 +81,10 @@ $DevWifi->container->singleton('mailer', function () {
     $mailer = new SimpleMail();
 
     if(MAILER_FROM)
-        $mailer->setFrom(MAILER_FROM);
+        $mailer->setFrom(MAILER_FROM, MAILER_FROM);
 
     if(MAILER_BCC)
-        $mailer->addMailHeader('Bcc', MAILER_BCC);
+        $mailer->addMailHeader('Bcc', MAILER_BCC, MAILER_BCC);
 
     $mailer->addGenericHeader('Content-Type', 'text; charset="utf-8"');
     return $mailer;
@@ -102,6 +103,16 @@ $authenticate = function() use ( $DevWifi ) {
         {
             $res->header('WWW-Authenticate', sprintf('Basic realm="%s"', 'DevWifi'));
             $DevWifi->halt(401, $DevWifi->view()->render('denied.html'));
+        }
+    };
+};
+
+// Checking if module is enable
+$checkEnabledPage = function ($module = true) {
+    return function () use ($module) {
+        if (!$module) {
+            $DevWifi = \Slim\Slim::getInstance();
+            $DevWifi->halt(401, $DevWifi->view()->render('disabled.html'));
         }
     };
 };
@@ -138,7 +149,8 @@ $DevWifi->container->singleton('blacklist', function () {
 });
 
 //////////////////////////// ROUTES //////////////////////////////////
-$DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
+$DevWifi->map(ROUTE_PREFIX.'/', $checkEnabledPage(APP_ENABLED), function() use($DevWifi) {
+
     $req = $DevWifi->request;
     if($req->isPost())
     {
@@ -151,8 +163,9 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 $entry->mac = $req->post('mac');
                 $entry->device = $req->post('device');
                 $entry->generateKey(STATIC_WEP);
+                $entry->type = $req->post('type');
 
-                if( $req->post('type') == 'u'  )
+                if( $entry->type == 'u' )
                     $entry->grade = $req->post('grade');
 
                 if($req->post('rules') != 'on')
@@ -169,7 +182,7 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
 
                 $DevWifi->entries->set($entry);
                 $DevWifi->entries->save();
-                $DevWifi->log->addInfo('New device added', $entry->toArray());
+                $DevWifi->log->addInfo('New device added', array_merge($entry->toArray(), array('ip' => $_SERVER['REMOTE_ADDR'])));
 
                 // send email
                 if($req->post('email'))
@@ -198,10 +211,10 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 if(!($entry instanceof Entry))
                     throw new InputErrorException('To urządzenie nie znajduje się w systemie.', 400);
 
-                if($entry->firstName != Entry::replacePolChars($req->post('firstName')))
+                if($entry->firstName != Entry::replacePolChars(ucfirst(strtolower($req->post('firstName')))))
                     throw new InputErrorException('Imię się nie zgadza.', 400);
 
-                if($entry->lastName != Entry::replacePolChars($req->post('lastName')))
+                if($entry->lastName != Entry::replacePolChars(ucfirst(strtolower($req->post('lastName')))))
                     throw new InputErrorException('Nazwisko się nie zgadza.', 400);
 
                 if($req->post('rules') != 'on')
@@ -211,7 +224,7 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
 
                 $DevWifi->entries->set($entry);
                 $DevWifi->entries->save();
-                $DevWifi->log->addInfo('Device key modified', $entry->toArray());
+                $DevWifi->log->addInfo('Device key modified', array_merge($entry->toArray(), array('ip' => $_SERVER['REMOTE_ADDR'])));
 
                 // send email
                 if($req->post('email'))
@@ -248,7 +261,7 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
 
                 $DevWifi->entries->delete($entry);
                 $DevWifi->entries->save();
-                $DevWifi->log->addInfo('Device deleted', $entry->toArray());
+                $DevWifi->log->addInfo('Device deleted', array_merge($entry->toArray(), array('ip' => $_SERVER['REMOTE_ADDR'])));
 
                 $DevWifi->view->appendData(array(
                     'deleted' => true
@@ -280,10 +293,45 @@ $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
     $DevWifi->render('rules.html');
 })->name('rules');
 
-if (MSG_ENABLED)
-    $DevWifi->get(ROUTE_PREFIX.'/kontakt', function() use($DevWifi) {
-        $DevWifi->render('contact.html');
-    })->name('contact');
+$DevWifi->map(ROUTE_PREFIX.'/kontakt', $checkEnabledPage(MSG_ENABLED), $checkEnabledPage(ADMIN_EMAIL), function() use($DevWifi) {
+    $req = $DevWifi->request;
+    if($req->isPost())
+    {
+        try {
+            if($req->post('action') == 'contact') {
+
+                //throw new InputErrorException('Nie umiesz wyslac emaila.', 400);
+                /*
+                $send = $DevWifi->mailer
+                        ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
+                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
+                        ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
+                        ->send();
+
+                    if(!$send)
+                        $DevWifi->view->appendData(array(
+                            'error' => 'Wysłanie wiadomości email na adres '.$req->post('email').' nie powiodło się!'
+                        ));
+
+                $DevWifi->log->addInfo('Device key modified', array_merge($entry->toArray(), array('ip' => $_SERVER['REMOTE_ADDR'])));
+                 */
+
+                $DevWifi->view->appendData(array(
+                    'sent' => true
+                ));
+            }
+        } catch(InputErrorException $e)
+        {
+            $DevWifi->view->appendData(array(
+                'error' => $e->getMessage(),
+                'email' => $req->post('inputEmail'),
+                'name' => $req->post('inputName'),
+                'message' => $req->post('inputMessage')
+            ));
+        }
+    }
+    $DevWifi->render('contact.html');
+})->via('GET', 'POST')->name('contact');
 
 $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
     $req = $DevWifi->request;
