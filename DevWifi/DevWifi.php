@@ -33,14 +33,13 @@
 $loader = require APP_ROOT . '/vendor/autoload.php';
 $loader->setPsr4('DevWifi\\', APP_ROOT . '/DevWifi');
 
-use  DevWifi\Entry;
+use DevWifi\Entry;
 
 //////////////////////// CREATE Slim APPLICATION //////////////////////////////////
 $DevWifi = new \Slim\Slim(array(
     'debug' => ENABLE_DEBUG,
     'templates.path' => APP_ROOT . '/templates',
 ));
-
 ///////////////////////////////// SETUP VIEW /////////////////////////////////////
 // https://github.com/codeguy/Slim-Views
 $DevWifi->view(new \Slim\Views\Twig());
@@ -58,13 +57,12 @@ $view->parserExtensions = array(
     new Twig_Extension_Debug()
 );
 
-$view->parserOptions = array(
-    'debug' => ENABLE_DEBUG
-);
-
 $view->appendData(array(
     'ROUTE_PREFIX' => ROUTE_PREFIX,
-    'BASEURL' => $DevWifi->request->getUrl()
+    'BASEURL' => $DevWifi->request->getUrl(),
+    'APP_TITLE' => APP_TITLE,
+    'MSG_ENABLED' => MSG_ENABLED,
+    'SHOW_WEP' => SHOW_WEP
 ));
 
 /////////////////////////// SETUP LOGGER //////////////////////////////
@@ -150,19 +148,24 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 $entry = new Entry();
                 $entry->firstName = $req->post('firstName');
                 $entry->lastName = $req->post('lastName');
-                if( $req->post('type') == 'u' )
-                    $entry->grade = $req->post('grade');
                 $entry->mac = $req->post('mac');
                 $entry->device = $req->post('device');
+                $entry->generateKey(STATIC_WEP);
+
+                if( $req->post('type') == 'u'  )
+                    $entry->grade = $req->post('grade');
 
                 if($req->post('rules') != 'on')
-                    throw new InputErrorException('You need to accept Terms & Conditions!', 400);
+                    throw new InputErrorException('Akceptacja regulaminu dostępu do sieci jest konieczna.', 400);
 
                 if($DevWifi->entries->get($entry->mac) instanceof Entry)
-                    throw new InputErrorException('This device already has access!', 400);
+                    throw new InputErrorException('To urządzenie obecnie znajduje się na liście dostępu.', 400);
 
                 if($DevWifi->blacklist->get($entry->mac) instanceof Entry)
-                    throw new InputErrorException('This device is blacklisted!', 400);
+                    throw new InputErrorException('To urządzenie zostało zablokowane.', 400);
+
+                if($req->post('email'))
+                    $entry->email = $req->post('email');
 
                 $DevWifi->entries->set($entry);
                 $DevWifi->entries->save();
@@ -186,23 +189,23 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 }
 
                 $DevWifi->view->appendData(array(
-                    'key' => $entry->key
+                    'key' => (STATIC_WEP) ? STATIC_WEP : $entry->key
                 ));
             }
             elseif($req->post('action') == 'key')
             {
                 $entry = $DevWifi->entries->get($req->post('mac'));
                 if(!($entry instanceof Entry))
-                    throw new InputErrorException('This device is not registered!', 400);
+                    throw new InputErrorException('To urządzenie nie znajduje się w systemie.', 400);
 
-                if($entry->firstName != $req->post('firstName'))
-                    throw new InputErrorException('First name does not match!', 400);
+                if($entry->firstName != Entry::replacePolChars($req->post('firstName')))
+                    throw new InputErrorException('Imię się nie zgadza.', 400);
 
-                if($entry->lastName != $req->post('lastName'))
-                    throw new InputErrorException('Last name does not match!', 400);
+                if($entry->lastName != Entry::replacePolChars($req->post('lastName')))
+                    throw new InputErrorException('Nazwisko się nie zgadza.', 400);
 
                 if($req->post('rules') != 'on')
-                    throw new InputErrorException('You need to accept Terms & Conditions!', 400);
+                    throw new InputErrorException('Akceptacja regulaminu dostępu do sieci jest konieczna.', 400);
 
                 $entry->generateKey();
 
@@ -228,20 +231,20 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
                 }
 
                 $DevWifi->view->appendData(array(
-                    'new_key' => $entry->key
+                    'new_key' => (STATIC_WEP) ? STATIC_WEP : $entry->key
                 ));
             }
             elseif($req->post('action') == 'delete')
             {
                 $entry = $DevWifi->entries->get($req->post('mac'));
                 if(!($entry instanceof Entry))
-                    throw new InputErrorException('This device is not registered!', 400);
+                    throw new InputErrorException('To urządzenie nie znajduje się w systemie.', 400);
 
-                if($entry->firstName != $req->post('firstName'))
-                    throw new InputErrorException('First name does not match!', 400);
+                if($entry->firstName != Entry::replacePolChars($req->post('firstName')))
+                    throw new InputErrorException('Imię się nie zgadza.', 400);
 
-                if($entry->lastName != $req->post('lastName'))
-                    throw new InputErrorException('Last name does not match!', 400);
+                if($entry->lastName != Entry::replacePolChars($req->post('lastName')))
+                    throw new InputErrorException('Nazwisko się nie zgadza.', 400);
 
                 $DevWifi->entries->delete($entry);
                 $DevWifi->entries->save();
@@ -276,6 +279,11 @@ $DevWifi->map(ROUTE_PREFIX.'/', function() use($DevWifi) {
 $DevWifi->get(ROUTE_PREFIX.'/regulamin', function() use($DevWifi) {
     $DevWifi->render('rules.html');
 })->name('rules');
+
+if (MSG_ENABLED)
+    $DevWifi->get(ROUTE_PREFIX.'/kontakt', function() use($DevWifi) {
+        $DevWifi->render('contact.html');
+    })->name('contact');
 
 $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi) {
     $req = $DevWifi->request;
