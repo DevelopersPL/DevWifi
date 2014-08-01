@@ -300,21 +300,28 @@ $DevWifi->map(ROUTE_PREFIX.'/kontakt', $checkEnabledPage(MSG_ENABLED), $checkEna
         try {
             if($req->post('action') == 'contact') {
 
-                //throw new InputErrorException('Nie umiesz wyslac emaila.', 400);
-                /*
+                if($req->post('rules') != 'on')
+                    throw new InputErrorException('Musisz zaakceptować regulamin.', 400);
+
+                $DevWifi->view->appendData(array(
+                        'name' => $req->post('inputName'),
+                        'message' => $req->post('inputMessage'),
+                        'ip' => $_SERVER['REMOTE_ADDR'],
+                    ));
+
                 $send = $DevWifi->mailer
-                        ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
-                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
-                        ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
-                        ->send();
+                    ->setTo(ADMIN_EMAIL, ADMIN_EMAIL)
+                    ->setFrom($req->post('inputEmail'), $req->post('inputName'))
+                    ->setSubject('Kontakt z '.APP_TITLE)
+                    ->setMessage($DevWifi->view->fetch('contact.txt'))
+                    ->send();
 
                     if(!$send)
                         $DevWifi->view->appendData(array(
-                            'error' => 'Wysłanie wiadomości email na adres '.$req->post('email').' nie powiodło się!'
+                            'error' => 'Wysłanie wiadomości email do administratora nie powiodło się!'
                         ));
 
-                $DevWifi->log->addInfo('Device key modified', array_merge($entry->toArray(), array('ip' => $_SERVER['REMOTE_ADDR'])));
-                 */
+                $DevWifi->log->addInfo('Sent user email to admin', array('name' => $req->post('inputMessage'), 'ip' => $_SERVER['REMOTE_ADDR']));
 
                 $DevWifi->view->appendData(array(
                     'sent' => true

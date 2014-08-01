@@ -1,0 +1,9 @@
+Użytkownik {{name}} przesyła następującą wiadomość:
+===================================================
+
+{{message}}
+
+===================================================
+
+Wiadomość wysłana z adresu IP: {{ip}}
+{{BASEURL}}

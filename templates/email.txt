@@ -10,7 +10,7 @@ Twój klucz WEP potrzebny do połączenia się z siecią Wi-Fi jest dostępny u 
 
 Klucz zadziała wyłącznie na tym urządzeniu.
 
-Korzystanie z naszej siecia podlega regulaminowi dostępnemu na stronie {{BASEURL}}{{urlFor('rules')}}.
+Korzystanie z naszej sieci podlega regulaminowi dostępnemu na stronie {{BASEURL}}{{urlFor('rules')}}.
 
 Pozdrawiamy,
 ZSE-E Radomsko
