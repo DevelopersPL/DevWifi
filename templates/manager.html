@@ -14,7 +14,26 @@
 {% endif %}
 <hr/>
 <div class="text-center">
-    <span class="h3">Lista autoryzowanych</span>
+    <span class="h3">Lista autoryzowanych</span><br />
+    <button class="btn btn-primary btn-xs" data-toggle="modal" data-target="#emailList">
+        Wyświetl listę adresów email
+    </button>
+</div>
+<div class="modal fade" id="emailList" tabindex="-1" role="dialog" aria-labelledby="emailListLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title" id="emailListLabel">Adresy email autoryzowanych użytkowników</h4>
+            </div>
+            <div class="modal-body">
+                <textarea cols="70">{% for entry in entries %}{{entry.email}}; {% endfor %}</textarea>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
 </div>
 <table class="table table-striped">
     <thead>
