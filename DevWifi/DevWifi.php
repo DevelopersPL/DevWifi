@@ -300,8 +300,11 @@ $DevWifi->map(ROUTE_PREFIX.'/kontakt', $checkEnabledPage(MSG_ENABLED), $checkEna
         try {
             if($req->post('action') == 'contact') {
 
+                if( !filter_var($req->post('inputEmail'), FILTER_VALIDATE_EMAIL) )
+                    throw new \InputErrorException('Adres e-mail nie jest poprawny.', 400);
+
                 if($req->post('rules') != 'on')
-                    throw new InputErrorException('Musisz zaakceptować regulamin.', 400);
+                    throw new InputErrorException('Akceptacja regulaminu jest konieczna.', 400);
 
                 $DevWifi->view->appendData(array(
                         'name' => $req->post('inputName'),
