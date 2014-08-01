@@ -191,7 +191,7 @@ $DevWifi->map(ROUTE_PREFIX.'/', $checkEnabledPage(APP_ENABLED), function() use($
                     $DevWifi->view->appendData(array('entry' => $entry));
                     $send = $DevWifi->mailer
                         ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
-                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
+                        ->setSubject('Klucz dostepu do '.APP_TITLE)
                         ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
                         ->send();
 
@@ -212,10 +212,10 @@ $DevWifi->map(ROUTE_PREFIX.'/', $checkEnabledPage(APP_ENABLED), function() use($
                     throw new InputErrorException('To urządzenie nie znajduje się w systemie.', 400);
 
                 if($entry->firstName != Entry::replacePolChars(ucfirst(strtolower($req->post('firstName')))))
-                    throw new InputErrorException('Imię się nie zgadza.', 400);
+                    throw new InputErrorException('Imię nie jest poprawne.', 400);
 
                 if($entry->lastName != Entry::replacePolChars(ucfirst(strtolower($req->post('lastName')))))
-                    throw new InputErrorException('Nazwisko się nie zgadza.', 400);
+                    throw new InputErrorException('Nazwisko nie jest poprawne.', 400);
 
                 if($req->post('rules') != 'on')
                     throw new InputErrorException('Akceptacja regulaminu dostępu do sieci jest konieczna.', 400);
@@ -233,7 +233,7 @@ $DevWifi->map(ROUTE_PREFIX.'/', $checkEnabledPage(APP_ENABLED), function() use($
                     $DevWifi->view->appendData(array('entry' => $entry));
                     $send = $DevWifi->mailer
                         ->setTo($req->post('email'), $entry->firstName.' '.$entry->lastName)
-                        ->setSubject('Klucz dostepu do ZSE-E Radomsko Wi-Fi')
+                        ->setSubject('Klucz dostepu do '.APP_TITLE)
                         ->setMessage($DevWifi->view->fetch('email.txt', array('entry' => $entry)))
                         ->send();
 
@@ -254,10 +254,10 @@ $DevWifi->map(ROUTE_PREFIX.'/', $checkEnabledPage(APP_ENABLED), function() use($
                     throw new InputErrorException('To urządzenie nie znajduje się w systemie.', 400);
 
                 if($entry->firstName != Entry::replacePolChars($req->post('firstName')))
-                    throw new InputErrorException('Imię się nie zgadza.', 400);
+                    throw new InputErrorException('Imię nie jest poprawne.', 400);
 
                 if($entry->lastName != Entry::replacePolChars($req->post('lastName')))
-                    throw new InputErrorException('Nazwisko się nie zgadza.', 400);
+                    throw new InputErrorException('Nazwisko nie jest poprawne.', 400);
 
                 $DevWifi->entries->delete($entry);
                 $DevWifi->entries->save();
@@ -351,7 +351,7 @@ $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi)
 
         if(!($entry instanceof Entry))
             $DevWifi->view->appendData(array(
-                'error' => 'Entry with MAC '.$req->post('mac').' does not exist!'
+                'error' => 'Wpis o adresie MAC '.$req->post('mac').' nie istnieje!'
             ));
         else
         {
