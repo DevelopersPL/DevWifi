@@ -3,7 +3,7 @@
 {% block content %}
 {#{ dump(entries) }#}
 <div class="text-center">
-    <span class="h2">Manager</span>
+    <span class="h2">Menadżer urządzeń</span>
 </div>
 {% if error is defined %}
 <div class="alert alert-danger">
@@ -14,19 +14,20 @@
 {% endif %}
 <hr/>
 <div class="text-center">
-    <span class="h3">Authorized list</span>
+    <span class="h3">Lista autoryzowanych</span>
 </div>
 <table class="table table-striped">
     <thead>
     <tr>
         <th>MAC</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Grade</th>
-        <th>Device Name</th>
-        <th>Date Added</th>
-        <th>Key</th>
+        <th>Imię</th>
+        <th>Nazwisko</th>
         <th></th>
+        <th>E-mail</th>
+        <th>Urządzenie</th>
+        <th>Data dodania</th>
+        <th>Klucz WEP</th>
+        <th>Akcje</th>
     </tr>
     </thead>
     <tbody>
@@ -35,47 +36,49 @@
         <td>{{entry.mac|upper}}</td>
         <td>{{entry.firstName}}</td>
         <td>{{entry.lastName}}</td>
-        <td>{{entry.grade}}</td>
-        <td>{{entry.device}}</td>
+        <td><span class="label label-primary">{% if entry.type == 'u' %}Uczeń {{entry.grade|upper}}{% elseif entry.type == 'n' %}Nauczyciel{% else %}Inny pracownik{% endif %}</span></td>
+        <td>{% if entry.email is defined %}<a href="mailto:{{entry.email}}">{{entry.email}}</a>{% endif %}</td>
+        <td>{% if entry.device == 'pc' %}Laptop{% elseif entry.device == 'tel' %}Telefon{% elseif entry.device == 'tab' %}Tablet{% else %}Inne{% endif %}</td>
         <td>{{entry.date|date("d.m.Y")}}</td>
-        <td>{{entry.key}}</td>
+        <td>{% if entry.key == 'static' %}{{ STATIC_WEP }}{% else %}{{entry.key}}{% endif %}</td>
         <td>
             <form method="post" style="float:left;">
                 <input type="hidden" name="action" value="delete" />
                 <input type="hidden" name="scope" value="entries" />
                 <input type="hidden" name="mac" value="{{entry.mac}}" />
-                <button type="submit" class="btn btn-warning btn-xs">Delete</button>
+                <button type="submit" class="btn btn-warning btn-xs">Usuń</button>
             </form>
             <form method="post" style="float:left; padding-left: 5px;">
                 <input type="hidden" name="action" value="blacklist" />
                 <input type="hidden" name="scope" value="entries" />
                 <input type="hidden" name="mac" value="{{entry.mac}}" />
-                <button type="submit" class="btn btn-danger btn-xs">Blacklist</button>
+                <button type="submit" class="btn btn-danger btn-xs">Zablokuj</button>
             </form>
         </td>
     </tr>
     {% else %}
     <tr>
-        <td colspan="8" class="text-center">This list s empty.</td>
+        <td colspan="8" class="text-center">Lista jest pusta.</td>
     </tr>
     {% endfor %}
     </tbody>
 </table>
 <hr/>
 <div class="text-center">
-    <span class="h3">Blacklist</span>
+    <span class="h3">Lista zablokowanych</span>
 </div>
 <table class="table table-striped">
     <thead>
     <tr>
         <th>MAC</th>
-        <th>First Name</th>
-        <th>Last Name</th>
-        <th>Grade</th>
-        <th>Device Name</th>
-        <th>Date Added</th>
-        <th>Key</th>
+        <th>Imię</th>
+        <th>Nazwisko</th>
         <th></th>
+        <th>E-mail</th>
+        <th>Urządzenie</th>
+        <th>Data dodania</th>
+        <th>Klucz WEP</th>
+        <th>Akcje</th>
     </tr>
     </thead>
     <tbody>
@@ -84,28 +87,29 @@
         <td>{{entry.mac|upper}}</td>
         <td>{{entry.firstName}}</td>
         <td>{{entry.lastName}}</td>
-        <td>{{entry.grade}}</td>
-        <td>{{entry.device}}</td>
+        <td><span class="label label-primary">{% if entry.type == 'u' %}Uczeń {{entry.grade|upper}}{% elseif entry.type == 'n' %}Nauczyciel{% else %}Inny pracownik{% endif %}</span></td>
+        <td>{% if entry.email is defined %}<a href="mailto:{{entry.email}}">{{entry.email}}</a>{% endif %}</td>
+        <td>{% if entry.device == 'pc' %}Laptop{% elseif entry.device == 'tel' %}Telefon{% elseif entry.device == 'tab' %}Tablet{% else %}Inne{% endif %}</td>
         <td>{{entry.date|date("d.m.Y")}}</td>
-        <td>{{entry.key}}</td>
+        <td>{% if entry.key == 'static' %}{{ STATIC_WEP }}{% else %}{{entry.key}}{% endif %}</td>
         <td>
             <form method="post" style="float:left;">
                 <input type="hidden" name="action" value="delete" />
                 <input type="hidden" name="scope" value="blacklist" />
                 <input type="hidden" name="mac" value="{{entry.mac}}" />
-                <button type="submit" class="btn btn-warning btn-xs">Delete</button>
+                <button type="submit" class="btn btn-warning btn-xs">Usuń</button>
             </form>
             <form method="post" style="float:left; padding-left: 5px;">
                 <input type="hidden" name="action" value="readd" />
                 <input type="hidden" name="scope" value="blacklist" />
                 <input type="hidden" name="mac" value="{{entry.mac}}" />
-                <button type="submit" class="btn btn-success btn-xs">Readd</button>
+                <button type="submit" class="btn btn-success btn-xs">Przywróć</button>
             </form>
         </td>
     </tr>
     {% else %}
     <tr>
-        <td colspan="8" class="text-center">This list s empty.</td>
+        <td colspan="8" class="text-center">Lista jest pusta.</td>
     </tr>
     {% endfor %}
     </tbody>
