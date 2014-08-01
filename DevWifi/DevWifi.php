@@ -355,7 +355,15 @@ $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi)
         else
             $entry = $DevWifi->blacklist->get($req->post('mac'));
 
-        if(!($entry instanceof Entry))
+        if($req->post('action') == 'log')
+        {
+            if( !filter_var($req->post('file'), FILTER_VALIDATE_REGEXP, array('options' => array('regexp'=>'/[a-z\-\.]+/'))) )
+                throw new \InputErrorException('Adres e-mail nie jest poprawny.', 400);
+            $DevWifi->view->appendData(array(
+                'logdata' => file_get_contents(APP_ROOT.'/logs/'.$req->post('file'))
+            ));
+        }
+        elseif(!($entry instanceof Entry))
             $DevWifi->view->appendData(array(
                 'error' => 'Wpis o adresie MAC '.$req->post('mac').' nie istnieje!'
             ));
@@ -387,9 +395,13 @@ $DevWifi->map(ROUTE_PREFIX.'/manager', $authenticate(), function() use($DevWifi)
             }
         }
     }
+    foreach (glob(APP_ROOT . '/logs/*.log') as $filename)
+        $logs[] =  basename($filename);
+
     $DevWifi->render('manager.html', array(
         'entries' => $DevWifi->entries->getAll(),
-        'blacklist' => $DevWifi->blacklist->getAll()
+        'blacklist' => $DevWifi->blacklist->getAll(),
+        'logs' => $logs
     ));
 })->via('GET', 'POST')->name('manager');
 
